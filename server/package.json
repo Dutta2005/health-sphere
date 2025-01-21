@@ -4,7 +4,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    
+    "build": "npm run build",
     "dev": "nodemon ./api/index.js"
   },
   "keywords": [],
