@@ -14,7 +14,7 @@ function App() {
   return (
     <ErrorBoundary FallbackComponent={SomethingWrong}>
       {/* <h1 className='text-3xl bg-primary dark:bg-dark-bg dark:text-dark-text'>Health Sphere</h1> */}
-      {/* <button onClick={toggleTheme}>Theme</button> */}
+      <button onClick={toggleTheme}>Theme</button>
       <div>
         <img src={Logo} alt="" />
       </div>
