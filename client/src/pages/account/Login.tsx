@@ -1,4 +1,5 @@
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
 import { Button } from "../../components/ui/button";
 import {
   Card,
@@ -10,8 +11,56 @@ import {
 } from "../../components/ui/card";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
+import { api } from "../../api/api";
+import { login } from "../../store/authSlice";
+import { useDispatch } from "react-redux";
 
 const Login = () => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { id, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [id]: value,
+    }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setIsLoading(true);
+
+    try {
+      const response = await api.post("/users/login", formData);
+      
+      if (response.status === 200) {       
+        dispatch(login(response.data.data.user));
+        navigate("/");
+      } else{
+        setError(
+          response.data.message || 
+          "An error occurred during login. Please try again."
+        );
+      }
+
+    } catch (err: any) {
+      setError(
+        err.response?.data?.message || 
+        "An error occurred during login. Please try again."
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen w-full bg-light-bg dark:bg-dark-bg/90 flex justify-center items-center p-4">
       <div className="absolute top-0 left-0 w-1/2 h-screen bg-primary/85 transform -skew-x-12 -translate-x-20" />
@@ -27,7 +76,11 @@ const Login = () => {
         </CardHeader>
 
         <CardContent>
-          <form className="flex flex-col space-y-4">
+          <form onSubmit={handleSubmit} className="flex flex-col space-y-4">
+            {error && (
+              <div className="text-red-500 text-sm text-center">{error}</div>
+            )}
+            
             <div className="space-y-2">
               <Label
                 htmlFor="email"
@@ -37,8 +90,12 @@ const Login = () => {
               </Label>
               <Input
                 id="email"
+                type="email"
+                value={formData.email}
+                onChange={handleChange}
                 placeholder="Enter your email"
                 className="h-11 bg-white dark:bg-dark-bg border-secondary focus:border-accent focus:ring-accent dark:text-dark-text"
+                required
               />
             </div>
 
@@ -52,31 +109,38 @@ const Login = () => {
               <Input
                 id="password"
                 type="password"
+                value={formData.password}
+                onChange={handleChange}
                 placeholder="Enter your password"
                 className="h-11 bg-white dark:bg-dark-bg border-secondary focus:border-accent focus:ring-accent dark:text-dark-text"
+                required
               />
             </div>
 
             <div className="flex justify-end">
               <Link
-                to={"/forgot-password"}
+                to="/forgot-password"
                 className="text-sm text-primary hover:text-secondary transition-colors"
               >
                 Forgot password?
               </Link>
             </div>
+
+            <Button 
+              type="submit"
+              disabled={isLoading}
+              className="w-full h-11 text-md dark:text-white bg-primary dark:bg-primary hover:bg-primary/90 dark:hover:bg-primary/90 transition-colors"
+            >
+              {isLoading ? "Signing in..." : "Sign In"}
+            </Button>
           </form>
         </CardContent>
 
         <CardFooter className="flex flex-col space-y-4">
-          <Button className="w-full h-11 text-md dark:text-white bg-primary dark:bg-primary hover:bg-primary/90 dark:hover:bg-primary/90 transition-colors">
-            Sign In
-          </Button>
-
           <p className="text-sm text-gray-600 dark:text-gray-400 text-center">
             Don't have an account?{" "}
             <Link
-              to={"/signup"}
+              to="/signup"
               className="text-accent hover:text-secondary dark:text-secondary dark:hover:text-accent transition-colors"
             >
               Sign up
