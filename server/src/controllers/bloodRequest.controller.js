@@ -78,7 +78,7 @@ const getBloodRequestsByUserId = asyncHandler(async (req, res) => {
         const userId = req.user._id;
         const bloodRequests = await BloodRequest.find({ userId });
         return res.status(200).json(
-            new ApiResponse(200, bloodRequests, "Blood requests fetched successfully")
+            new ApiResponse(200, "Blood requests fetched successfully", bloodRequests)
         );
     } catch (error) {
         return res.status(500).json(
@@ -99,7 +99,7 @@ const updateBloodRequestStatus = asyncHandler(async (req, res) => {
         bloodRequest.status = status;
         const updatedBloodRequest = await bloodRequest.save();
         return res.status(200).json(
-            new ApiResponse(200, updatedBloodRequest, "Blood request status updated successfully")
+            new ApiResponse(200, "Blood request status updated successfully", updatedBloodRequest)
         );
     } catch (error) {
         return res.status(500).json(
@@ -124,7 +124,7 @@ const updateBloodRequest = asyncHandler(async (req, res) => {
         bloodRequest.address = address || bloodRequest.address;
         const updatedBloodRequest = await bloodRequest.save();
         return res.status(200).json(
-            new ApiResponse(200, updatedBloodRequest, "Blood request updated successfully")
+            new ApiResponse(200, "Blood request updated successfully", updatedBloodRequest)
         );
     } catch (error) {
         return res.status(500).json(

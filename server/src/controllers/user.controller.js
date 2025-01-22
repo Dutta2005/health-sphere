@@ -120,11 +120,11 @@ const loginUser = asyncHandler(async (req, res) => {
         .cookie("accessToken", accessToken, options)
         .cookie("refreshToken", refreshToken, options)
         .json(
-            new ApiResponse(200, {
+            new ApiResponse(200, "User logged in successfully", {
                 user: loggedInUser,
                 accessToken,
                 refreshToken
-            }, "User logged in successfully")
+            })
         );
 });
 
@@ -147,7 +147,7 @@ const logoutUser = asyncHandler(async (req, res) => {
         .status(200)
         .clearCookie("accessToken", options)
         .clearCookie("refreshToken", options)
-        .json(new ApiResponse(200, {}, "User logged out successfully"));
+        .json(new ApiResponse(200, "User logged out successfully", {}));
 });
 
 // Refresh access token
@@ -188,8 +188,8 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
             .json(
                 new ApiResponse(
                     200,
-                    { accessToken, refreshToken: newRefreshToken },
-                    "Access token refreshed"
+                    "Access token refreshed",
+                    { accessToken, refreshToken: newRefreshToken }
                 )
             );
     } catch (error) {
@@ -221,7 +221,7 @@ const changeCurrentPassword = asyncHandler(async (req, res) => {
     await user.save({ validateBeforeSave: false });
 
     return res.status(200).json(
-        new ApiResponse(200, {}, "Password changed successfully")
+        new ApiResponse(200, "Password changed successfully", {})
     );
 })
 
@@ -244,7 +244,7 @@ const updateUser = asyncHandler(async (req, res) => {
     ).select("-password -refreshToken");
 
     return res.status(200).json(
-        new ApiResponse(200, user, "Profile updated successfully")
+        new ApiResponse(200, "Profile updated successfully", user)
     );
 });
 
@@ -264,7 +264,7 @@ const searchDonors = asyncHandler(async (req, res) => {
         .sort({ createdAt: -1 });
 
     return res.status(200).json(
-        new ApiResponse(200, donors, "Donors fetched successfully")
+        new ApiResponse(200, "Donors fetched successfully", donors)
     );
 });
 
@@ -285,14 +285,14 @@ const updateDonationStatus = asyncHandler(async (req, res) => {
     ).select("-password -refreshToken");
 
     return res.status(200).json(
-        new ApiResponse(200, user, "Donation status updated successfully")
+        new ApiResponse(200, "Donation status updated successfully", user)
     );
 });
 
 // Get current user
 const getCurrentUser = asyncHandler(async (req, res) => {
     return res.status(200).json(
-        new ApiResponse(200, req.user, "User fetched successfully")
+        new ApiResponse(200, "User fetched successfully", req.user)
     );
 });
 
