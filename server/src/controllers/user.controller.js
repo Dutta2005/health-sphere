@@ -122,7 +122,7 @@ const loginUser = asyncHandler(async (req, res) => {
         secure: true,
         sameSite: "none",
         maxAge: parseInt(process.env.REFRESH_TOKEN_EXPIARY)
-    }
+   }
 
     return res
         .status(200)
