@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "build": "npm run build",
-    "dev": "nodemon ./api/index.js"
+    "dev": "nodemon ./api/index.js",
+    "app": "concurrently \"npm run dev\" \"cd .. && cd client && npm run dev\""
   },
   "keywords": [],
   "author": "",
@@ -21,6 +22,7 @@
     "mongoose": "^8.9.5"
   },
   "devDependencies": {
+    "concurrently": "^9.1.2",
     "nodemon": "^3.1.9",
     "prettier": "^3.4.2"
   }
