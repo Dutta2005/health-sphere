@@ -6,7 +6,7 @@ const app = express();
 
 app.use(cors({
     // origin: process.env.CORS_ORIGIN,
-    origin: "http://localhost:5173" || "https://health-sphere-eight.vercel.app",
+    origin: "https://health-sphere-eight.vercel.app",
     credentials: true
 }))
 
