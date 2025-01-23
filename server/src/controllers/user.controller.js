@@ -114,14 +114,16 @@ const loginUser = asyncHandler(async (req, res) => {
         httpOnly: true,
         secure: true,
         sameSite: "none",
-        maxAge: parseInt(process.env.ACCESS_TOKEN_EXPIARY)
+        maxAge: parseInt(process.env.ACCESS_TOKEN_EXPIARY),
+        domain: '.vercel.app'
     }
 
     const refreshOptions = {
         httpOnly: true,
         secure: true,
         sameSite: "none",
-        maxAge: parseInt(process.env.REFRESH_TOKEN_EXPIARY)
+        maxAge: parseInt(process.env.REFRESH_TOKEN_EXPIARY),
+        domain: '.vercel.app'
    }
 
     return res
