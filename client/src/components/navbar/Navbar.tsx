@@ -1,6 +1,6 @@
 import { useSelector, useDispatch } from "react-redux";
 import { NavLink } from "react-router-dom";
-import { User } from "lucide-react";
+import { Moon, User } from "lucide-react";
 import {
   NavigationMenu,
   NavigationMenuItem,
@@ -31,22 +31,16 @@ const Navbar = () => {
 
   return (
     <nav
-      className={`fixed w-full top-0 z-50 backdrop-blur-sm ${
-        theme === "dark"
-          ? "bg-dark-bg text-dark-text"
-          : "bg-light-bg text-light-text"
-      }`}
+      className={'fixed w-full top-0 z-50 backdrop-blur-sm '}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Left side - Brand/Logo */}
           <NavLink
             to="/"
-            className={`text-xl font-semibold ${
-              theme === "dark" ? "text-dark-text" : "text-primary"
-            } hover:text-accent transition-colors`}
+            className={'text-xl font-semibold'}
           >
-            Health Sphere
+            <span className="text-accent">Health</span> <span className="text-primary">Sphere</span>
           </NavLink>
 
           {/* Center - Navigation */}
@@ -60,9 +54,7 @@ const Navbar = () => {
                       `hover:text-accent transition-colors ${
                         isActive
                           ? "text-accent"
-                          : theme === "dark"
-                          ? "text-dark-text"
-                          : "text-light-text"
+                          : ""
                       }`
                     }
                   >
@@ -111,54 +103,100 @@ const Navbar = () => {
 
           {/* Right side - User Menu */}
           <div className="flex items-center gap-4">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                {isAuthenticated ? (
-                  <Avatar className="cursor-pointer hover:ring-2 hover:ring-accent transition-all">
-                    <AvatarFallback>
-                      <User className="h-5 w-5" />
-                    </AvatarFallback>
-                  </Avatar>
-                ) : (
-                  <Avatar className="cursor-pointer">
-                    <AvatarFallback>
-                      <User className="h-5 w-5" />
-                    </AvatarFallback>
-                  </Avatar>
-                )}
-              </DropdownMenuTrigger>
-              <DropdownMenuContent
-                align="end"
-                className={`w-48 p-2 rounded-lg shadow-lg backdrop-blur-md ${
-                  theme === "dark"
-                    ? "bg-dark-bg/75 text-dark-text"
-                    : "bg-light-bg/75 text-light-text"
-                }`}
-              >
-                {isAuthenticated && (
-                  <DropdownMenuItem className="hover:bg-accent/20 rounded-md transition-colors">
-                    <NavLink to="/profile" className="w-full">
-                      Profile
-                    </NavLink>
-                  </DropdownMenuItem>
-                )}
-                <DropdownMenuItem className="hover:bg-accent/20 rounded-md transition-colors">
-                  <div className="flex items-center justify-between w-full">
-                    <span>Dark Mode</span>
-                    <Switch
-                      checked={theme === "dark"}
-                      onCheckedChange={handleThemeToggle}
-                      className="ml-2"
-                    />
-                  </div>
-                </DropdownMenuItem>
-                {isAuthenticated && (
-                  <DropdownMenuItem className="hover:bg-accent/20 rounded-md transition-colors">
-                    <Logoutbtn />
-                  </DropdownMenuItem>
-                )}
-              </DropdownMenuContent>
-            </DropdownMenu>
+          <DropdownMenu>
+  <DropdownMenuTrigger asChild>
+    <Avatar 
+      className={`
+        cursor-pointer 
+        ${isAuthenticated 
+          ? "hover:ring-2 hover:ring-accent transition-all" 
+          : ""
+        }
+      `}
+    >
+      <AvatarFallback>
+        <User className="h-5 w-5 text-light-text dark:text-dark-text" />
+      </AvatarFallback>
+    </Avatar>
+  </DropdownMenuTrigger>
+  
+  <DropdownMenuContent
+    align="end"
+    className={`
+      w-56 
+      p-2 
+      rounded-xl 
+      shadow-2xl 
+      backdrop-blur-md 
+      border 
+      ${theme === "dark" 
+        ? "bg-dark-bg/80 text-dark-text border-secondary/20" 
+        : "bg-light-bg/80 text-light-text border-secondary/20"
+      }
+    `}
+  >
+    {isAuthenticated && (
+      <>
+        <DropdownMenuItem 
+          className="
+            hover:bg-accent/10 
+            rounded-md 
+            transition-colors 
+            focus:bg-accent/10
+          "
+        >
+          <NavLink 
+            to="/profile" 
+            className="flex items-center w-full gap-2"
+          >
+            <User className="h-4 w-4 opacity-70" />
+            Profile
+          </NavLink>
+        </DropdownMenuItem>
+        
+        <div className="border-t border-secondary/20 my-1" />
+      </>
+    )}
+    
+    <DropdownMenuItem 
+      className="
+        hover:bg-accent/10 
+        rounded-md 
+        transition-colors 
+        focus:bg-accent/10
+      "
+    >
+      <div className="flex items-center justify-between w-full">
+        <div className="flex items-center gap-2">
+          <Moon className="h-4 w-4 opacity-70" />
+          <span>Dark Mode</span>
+        </div>
+        <Switch
+          checked={theme === "dark"}
+          onCheckedChange={handleThemeToggle}
+        />
+      </div>
+    </DropdownMenuItem>
+    
+    {isAuthenticated && (
+      <>
+        <div className="border-t border-secondary/20 my-1" />
+        
+        <DropdownMenuItem 
+          className="
+            hover:bg-accent/10 
+            rounded-md 
+            transition-colors 
+            focus:bg-accent/10
+            text-primary
+          "
+        >
+          <Logoutbtn />
+        </DropdownMenuItem>
+      </>
+    )}
+  </DropdownMenuContent>
+</DropdownMenu>
           </div>
         </div>
       </div>
