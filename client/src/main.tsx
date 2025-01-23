@@ -12,6 +12,8 @@ import Home from './pages/Home.tsx'
 import Error404 from './components/errors/Error404.tsx'
 import Login from './pages/account/Login.tsx'
 import Signup from './pages/account/Signup.tsx'
+import BloodBridge from './pages/BloodBridge.tsx'
+import Discussions from './pages/Discussions.tsx'
 
 const router = createBrowserRouter([
   {
@@ -20,6 +22,11 @@ const router = createBrowserRouter([
     children: [
       { path: '', element: <Home /> },
       { path: '*', element: <Error404 /> },
+      {
+        path: 'bloodbridge',
+        element: <BloodBridge />
+      },
+      { path: 'discussions', element: <Discussions /> },
     ]
   },
   { 
@@ -29,7 +36,7 @@ const router = createBrowserRouter([
   {
     path: 'signup',
     element: <Signup />
-  },
+  }, 
 ])
 
 let persistor = persistStore(store);

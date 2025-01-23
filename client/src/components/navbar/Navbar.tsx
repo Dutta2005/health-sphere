@@ -54,11 +54,43 @@ const Navbar = () => {
                       `hover:text-accent transition-colors ${
                         isActive
                           ? "text-accent"
-                          : ""
+                          : "dark:text-dark-text"
                       }`
                     }
                   >
                     Home
+                  </NavLink>
+                </NavigationMenuItem>
+              )}
+              {isAuthenticated && (
+                <NavigationMenuItem>
+                  <NavLink
+                    to="/bloodbridge"
+                    className={({ isActive }) =>
+                      `hover:text-accent transition-colors ${
+                        isActive
+                          ? "text-accent"
+                          : "dark:text-dark-text"
+                      }`
+                    }
+                  >
+                    Blood Bridge
+                  </NavLink>
+                </NavigationMenuItem>
+              )}
+              {isAuthenticated && (
+                <NavigationMenuItem>
+                  <NavLink
+                    to="/discussions"
+                    className={({ isActive }) =>
+                      `hover:text-accent transition-colors ${
+                        isActive
+                          ? "text-accent"
+                          : "dark:text-dark-text"
+                      }`
+                    }
+                  >
+                    Discussions
                   </NavLink>
                 </NavigationMenuItem>
               )}
