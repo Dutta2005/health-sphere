@@ -110,15 +110,24 @@ const loginUser = asyncHandler(async (req, res) => {
 
     const loggedInUser = await User.findById(user._id).select("-password -refreshToken");
 
-    const options = {
+    const accessOptions = {
         httpOnly: true,
-        secure: true
-    };
+        secure: true,
+        sameSite: "none",
+        maxAge: parseInt(process.env.ACCESS_TOKEN_EXPIARY)
+    }
+
+    const refreshOptions = {
+        httpOnly: true,
+        secure: true,
+        sameSite: "none",
+        maxAge: parseInt(process.env.REFRESH_TOKEN_EXPIARY)
+    }
 
     return res
         .status(200)
-        .cookie("accessToken", accessToken, options)
-        .cookie("refreshToken", refreshToken, options)
+        .cookie("accessToken", accessToken, accessOptions)
+        .cookie("refreshToken", refreshToken, refreshOptions)
         .json(
             new ApiResponse(200, "User logged in successfully", {
                 user: loggedInUser,
@@ -133,14 +142,15 @@ const logoutUser = asyncHandler(async (req, res) => {
     await User.findByIdAndUpdate(
         req.user._id,
         {
-            $unset: { refreshToken: 1 }
+            $set: { refreshToken: undefined }
         },
         { new: true }
     );
 
     const options = {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production"
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "none"
     };
 
     return res
