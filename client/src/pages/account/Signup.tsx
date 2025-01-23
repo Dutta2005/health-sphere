@@ -1,118 +1,473 @@
-import { Link } from "react-router";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "../../components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../../components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "../../components/ui/card";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
+import { useToast } from "../../hooks/use-toast";
+import { api } from "../../api/api";
+
+interface FormData {
+  name: string;
+  phone: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+  age: string;
+  canDonate: boolean;
+  address: {
+    state: string;
+    district: string;
+    city: string;
+  };
+  status: string;
+  info: {
+    bloodGroup: string;
+    height: string;
+    weight: string;
+  };
+  termsAccepted: boolean;
+}
+
+interface Errors {
+  name?: string;
+  phone?: string;
+  email?: string;
+  password?: string;
+  confirmPassword?: string;
+  age?: string;
+  state?: string;
+  district?: string;
+  city?: string;
+  bloodGroup?: string;
+  height?: string;
+  weight?: string;
+  termsAccepted?: string;
+  status?: "doctor" | "medical student" | "others";
+}
 
 const Signup = () => {
-    return (
-      <div className="min-h-screen w-full bg-light-bg dark:bg-dark-bg/90 flex justify-center items-center p-4">
-        <div className="fixed top-0 left-0 w-1/2 h-full bg-accent/85 transform -skew-x-12 -translate-x-20" />
-        
-        <Card className="relative w-full max-w-md bg-white/95 dark:bg-dark-bg/95 backdrop-blur-sm shadow-2xl border-0">
-          <CardHeader className="space-y-4">
-            <CardTitle className="text-3xl font-bold text-center text-light-text dark:text-dark-text">
-              Create Account
-            </CardTitle>
-            <CardDescription className="text-center text-gray-600 dark:text-dark-text/80">
-              Join us today and get started
-            </CardDescription>
-          </CardHeader>
-          
-          <CardContent>
-            <form className="flex flex-col space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="firstName" className="text-light-text dark:text-dark-text font-medium">
-                    First Name
-                  </Label>
-                  <Input 
-                    id="firstName" 
-                    placeholder="John" 
-                    className="h-11 bg-white dark:bg-dark-bg border-secondary focus:border-accent focus:ring-accent dark:text-dark-text"
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="lastName" className="text-light-text dark:text-dark-text font-medium">
-                    Last Name
-                  </Label>
-                  <Input 
-                    id="lastName" 
-                    placeholder="Doe" 
-                    className="h-11 bg-white dark:bg-dark-bg border-secondary focus:border-accent focus:ring-accent dark:text-dark-text"
-                  />
-                </div>
-              </div>
-  
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  const [formData, setFormData] = useState<FormData>({
+    name: "",
+    phone: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    age: "",
+    canDonate: true,
+    address: {
+      state: "",
+      district: "",
+      city: "",
+    },
+    status: "others",
+    info: {
+      bloodGroup: "",
+      height: "",
+      weight: "",
+    },
+    termsAccepted: false,
+  });
+
+  const [errors, setErrors] = useState<Errors>({});
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    const { id, value } = e.target;
+
+    // Handle checkbox separately
+    const isCheckbox = (e.target as HTMLInputElement).type === "checkbox";
+    const inputValue = isCheckbox
+      ? (e.target as HTMLInputElement).checked
+      : value;
+
+    setFormData((prev) => {
+      // Handle nested fields
+      if (id.includes(".")) {
+        const [parent, child] = id.split(".");
+
+        // Type-safe nested update
+        return {
+          ...prev,
+          [parent]:
+            parent === "address"
+              ? { ...prev.address, [child]: inputValue }
+              : parent === "info"
+              ? { ...prev.info, [child]: inputValue }
+              : prev[parent as keyof FormData],
+        };
+      }
+
+      // Handle top-level fields
+      return {
+        ...prev,
+        [id]: inputValue,
+      };
+    });
+  };
+
+  const validateForm = (): boolean => {
+    const newErrors: Errors = {};
+
+    // Validation logic remains the same as previous implementation
+    if (!formData.name) newErrors.name = "Name is required";
+    if (!formData.phone) newErrors.phone = "Phone number is required";
+    if (!formData.email) newErrors.email = "Email is required";
+    if (!formData.password) newErrors.password = "Password is required";
+    if (formData.password !== formData.confirmPassword) {
+      newErrors.confirmPassword = "Passwords do not match";
+    }
+    if (!formData.age) newErrors.age = "Age is required";
+    if (!formData.address.state) newErrors.state = "State is required";
+    if (!formData.address.district) newErrors.district = "District is required";
+    if (!formData.address.city) newErrors.city = "City is required";
+    if (!formData.info.bloodGroup)
+      newErrors.bloodGroup = "Blood group is required";
+    if (!formData.info.height) newErrors.height = "Height is required";
+    if (!formData.info.weight) newErrors.weight = "Weight is required";
+    if (!formData.termsAccepted)
+      newErrors.termsAccepted = "You must accept the terms and conditions";
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!validateForm()) return;
+
+    try {
+      const response = await api.post("/users/register", {
+        name: formData.name,
+        phone: formData.phone,
+        email: formData.email,
+        password: formData.password,
+        age: formData.age,
+        canDonate: formData.canDonate,
+        address: formData.address,
+        status: formData.status,
+        info: formData.info,
+      });
+
+      if (response.status === 201) {
+        toast({
+          title: "Registration Successful",
+          description: "Your account has been created.",
+          variant: "default",
+        });
+        navigate("/login");
+      } else {
+        toast({
+          title: "Registration Failed",
+          description: response.data.message || "Something went wrong",
+          variant: "destructive",
+        });
+      }
+    } catch (error: any) {
+      toast({
+        title: "Registration Failed",
+        description: error.response?.data?.message || "Something went wrong",
+        variant: "destructive",
+      });
+    }
+  };
+
+  return (
+    <div className="min-h-screen w-full bg-light-bg dark:bg-dark-bg/90 flex justify-center items-center p-4">
+      <div className="fixed top-0 left-0 w-1/2 h-full bg-accent/85 transform -skew-x-12 -translate-x-20" />
+
+      <Card className="relative w-full max-w-lg bg-white/95 dark:bg-dark-bg/95 backdrop-blur-sm shadow-2xl border-0">
+        <CardHeader className="space-y-4">
+          <CardTitle className="text-3xl font-bold text-center text-light-text dark:text-dark-text">
+            Create Account
+          </CardTitle>
+          <CardDescription className="text-center text-gray-600 dark:text-dark-text/80">
+            Join us and become a potential life-saver
+          </CardDescription>
+        </CardHeader>
+
+        <CardContent>
+          <form onSubmit={handleSubmit} className="flex flex-col space-y-4">
+            <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="email" className="text-light-text dark:text-dark-text font-medium">
-                  Email
-                </Label>
-                <Input 
-                  id="email" 
+                <Label htmlFor="name">Full Name</Label>
+                <Input
+                  id="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  placeholder="John Doe"
+                  className={`h-11 ${errors.name ? "border-red-500" : ""}`}
+                />
+                {errors.name && (
+                  <p className="text-red-500 text-sm">{errors.name}</p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="phone">Phone Number</Label>
+                <Input
+                  id="phone"
+                  value={formData.phone}
+                  onChange={handleChange}
+                  placeholder="1234567890"
+                  className={`h-11 ${errors.phone ? "border-red-500" : ""}`}
+                />
+                {errors.phone && (
+                  <p className="text-red-500 text-sm">{errors.phone}</p>
+                )}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="age">Age</Label>
+                <Input
+                  id="age"
+                  type="number"
+                  value={formData.age}
+                  onChange={handleChange}
+                  placeholder="25"
+                  className={`h-11 ${errors.age ? "border-red-500" : ""}`}
+                />
+                {errors.age && (
+                  <p className="text-red-500 text-sm">{errors.age}</p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
                   type="email"
-                  placeholder="john.doe@example.com" 
-                  className="h-11 bg-white dark:bg-dark-bg border-secondary focus:border-accent focus:ring-accent dark:text-dark-text"
+                  value={formData.email}
+                  onChange={handleChange}
+                  placeholder="john.doe@example.com"
+                  className={`h-11 ${errors.email ? "border-red-500" : ""}`}
                 />
+                {errors.email && (
+                  <p className="text-red-500 text-sm">{errors.email}</p>
+                )}
               </div>
-              
+            </div>
+
+            <div className="grid grid-cols-3 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="password" className="text-light-text dark:text-dark-text font-medium">
-                  Password
-                </Label>
-                <Input 
-                  id="password" 
-                  type="password" 
+                <Label htmlFor="address.state">State</Label>
+                <Input
+                  id="address.state"
+                  value={formData.address.state}
+                  onChange={handleChange}
+                  placeholder="Maharashtra"
+                  className={`h-11 ${errors.state ? "border-red-500" : ""}`}
+                />
+                {errors.state && (
+                  <p className="text-red-500 text-sm">{errors.state}</p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="address.district">District</Label>
+                <Input
+                  id="address.district"
+                  value={formData.address.district}
+                  onChange={handleChange}
+                  placeholder="Mumbai"
+                  className={`h-11 ${errors.district ? "border-red-500" : ""}`}
+                />
+                {errors.district && (
+                  <p className="text-red-500 text-sm">{errors.district}</p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="address.city">City</Label>
+                <Input
+                  id="address.city"
+                  value={formData.address.city}
+                  onChange={handleChange}
+                  placeholder="Mumbai City"
+                  className={`h-11 ${errors.city ? "border-red-500" : ""}`}
+                />
+                {errors.city && (
+                  <p className="text-red-500 text-sm">{errors.city}</p>
+                )}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="info.bloodGroup">Blood Group</Label>
+                <Input
+                  id="info.bloodGroup"
+                  value={formData.info.bloodGroup}
+                  onChange={handleChange}
+                  placeholder="A+"
+                  className={`h-11 ${
+                    errors.bloodGroup ? "border-red-500" : ""
+                  }`}
+                />
+                {errors.bloodGroup && (
+                  <p className="text-red-500 text-sm">{errors.bloodGroup}</p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="info.height">Height (cm)</Label>
+                <Input
+                  id="info.height"
+                  type="number"
+                  value={formData.info.height}
+                  onChange={handleChange}
+                  placeholder="170"
+                  className={`h-11 ${errors.height ? "border-red-500" : ""}`}
+                />
+                {errors.height && (
+                  <p className="text-red-500 text-sm">{errors.height}</p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="info.weight">Weight (kg)</Label>
+                <Input
+                  id="info.weight"
+                  type="number"
+                  value={formData.info.weight}
+                  onChange={handleChange}
+                  placeholder="65"
+                  className={`h-11 ${errors.weight ? "border-red-500" : ""}`}
+                />
+                {errors.weight && (
+                  <p className="text-red-500 text-sm">{errors.weight}</p>
+                )}
+              </div>
+            </div>
+
+            <select
+              id="status"
+              value={formData.status}
+              onChange={handleChange}
+              className={`
+    w-full h-11 
+    border rounded 
+    bg-white dark:bg-dark-bg 
+    text-light-text dark:text-dark-text
+    border-secondary 
+    focus:ring-accent focus:border-accent
+    ${errors.status ? "border-red-500" : ""}
+  `}
+            >
+              <option value="doctor">Doctor</option>
+              <option value="medical student">Medical Student</option>
+              <option value="others">Others</option>
+            </select>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="password">Password</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  value={formData.password}
+                  onChange={handleChange}
                   placeholder="Create a strong password"
-                  className="h-11 bg-white dark:bg-dark-bg border-secondary focus:border-accent focus:ring-accent dark:text-dark-text"
+                  className={`h-11 ${errors.password ? "border-red-500" : ""}`}
                 />
+                {errors.password && (
+                  <p className="text-red-500 text-sm">{errors.password}</p>
+                )}
               </div>
-  
+
               <div className="space-y-2">
-                <Label htmlFor="confirmPassword" className="text-light-text dark:text-dark-text font-medium">
-                  Confirm Password
-                </Label>
-                <Input 
-                  id="confirmPassword" 
-                  type="password" 
+                <Label htmlFor="confirmPassword">Confirm Password</Label>
+                <Input
+                  id="confirmPassword"
+                  type="password"
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
                   placeholder="Confirm your password"
-                  className="h-11 bg-white dark:bg-dark-bg border-secondary focus:border-accent focus:ring-accent dark:text-dark-text"
+                  className={`h-11 ${
+                    errors.confirmPassword ? "border-red-500" : ""
+                  }`}
                 />
+                {errors.confirmPassword && (
+                  <p className="text-red-500 text-sm">
+                    {errors.confirmPassword}
+                  </p>
+                )}
               </div>
-              
-              <div className="flex items-start space-x-2 text-sm">
-                <input type="checkbox" id="terms" className="mt-1 rounded border-secondary text-accent focus:ring-accent" />
-                <label htmlFor="terms" className="text-gray-600 dark:text-gray-400">
-                  I agree to the{' '}
-                  <Link to={'/'} className="text-accent hover:text-secondary dark:text-secondary dark:hover:text-accent transition-colors">
-                    Terms of Service
-                  </Link>
-                  {' '}and{' '}
-                  <Link to={'/'} className="text-accent hover:text-secondary dark:text-secondary dark:hover:text-accent transition-colors">
-                    Privacy Policy
-                  </Link>
-                </label>
-              </div>
-            </form>
-          </CardContent>
-          
-          <CardFooter className="flex flex-col space-y-4">
-            <Button className="w-full h-11 bg-accent dark:bg-accent hover:bg-accent/90 dark:hover:bg-accent/90 transition-colors">
+            </div>
+
+            <div className="flex items-start space-x-2 text-sm">
+              <input
+                type="checkbox"
+                id="termsAccepted"
+                checked={formData.termsAccepted}
+                onChange={handleChange}
+                className={`mt-1 rounded border-secondary text-accent focus:ring-accent ${
+                  errors.termsAccepted ? "border-red-500" : ""
+                }`}
+              />
+              <label
+                htmlFor="termsAccepted"
+                className={`text-gray-600 dark:text-gray-400 ${
+                  errors.termsAccepted ? "text-red-500" : ""
+                }`}
+              >
+                I agree to the{" "}
+                <Link
+                  to={"/"}
+                  className="text-accent hover:text-secondary dark:text-secondary dark:hover:text-accent transition-colors"
+                >
+                  Terms of Service
+                </Link>{" "}
+                and{" "}
+                <Link
+                  to={"/"}
+                  className="text-accent hover:text-secondary dark:text-secondary dark:hover:text-accent transition-colors"
+                >
+                  Privacy Policy
+                </Link>
+              </label>
+            </div>
+            {errors.termsAccepted && (
+              <p className="text-red-500 text-sm">{errors.termsAccepted}</p>
+            )}
+
+            <Button
+              type="submit"
+              className="w-full h-11 bg-accent dark:bg-accent hover:bg-accent/90 dark:hover:bg-accent/90 transition-colors"
+            >
               Create Account
             </Button>
-            
-            <p className="text-sm text-gray-600 dark:text-gray-400 text-center">
-              Already have an account?{' '}
-              <Link to={'/login'} className="text-accent hover:text-secondary dark:text-secondary dark:hover:text-accent transition-colors">
-                Sign in
-              </Link>
-            </p>
-          </CardFooter>
-        </Card>
-      </div>
-    );
-  };
-  
+          </form>
+        </CardContent>
+
+        <CardFooter>
+          <p className="text-sm text-gray-600 dark:text-gray-400 text-center w-full">
+            Already have an account?{" "}
+            <Link
+              to={"/login"}
+              className="text-accent hover:text-secondary dark:text-secondary dark:hover:text-accent transition-colors"
+            >
+              Sign in
+            </Link>
+          </p>
+        </CardFooter>
+      </Card>
+    </div>
+  );
+};
 
 export default Signup;

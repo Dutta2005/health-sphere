@@ -2,18 +2,20 @@ import { configureStore, combineReducers} from '@reduxjs/toolkit'
 import storage from 'redux-persist/lib/storage'
 import { persistReducer, FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER } from "redux-persist";
 import themeSlice from './themeSlice'
+import authSlice from './authSlice'
 
-const persistCofig = {
+const persistConfig = {
     key: 'root',
     version: 1,
     storage
 }
 
 const reducer = combineReducers({
-    theme: themeSlice
+    theme: themeSlice,
+    auth: authSlice
 });
 
-const persistedReducer = persistReducer(persistCofig, reducer);
+const persistedReducer = persistReducer(persistConfig, reducer);
 
 export const store = configureStore({
     reducer: persistedReducer,
@@ -23,3 +25,5 @@ export const store = configureStore({
         }
     })    
 })
+
+export type RootState = ReturnType<typeof store.getState>

@@ -1,10 +1,15 @@
-interface Props {}
+import { useSelector } from "react-redux"
 
-function Home(props: Props) {
-    const {} = props
+function Home() {
+    const isAuthenticated = useSelector((state: any) => state.auth.isAuthenticated)
     return (
         <div>
-            <h1 className="text-3xl dark:bg-dark-bg dark:text-dark-text">Home</h1>
+            <h1>Home</h1>
+            {isAuthenticated ? (
+                <p>Welcome to the home page!</p>
+            ) : (
+                <p>You are not authenticated. Please login to access this page.</p>
+            )}
         </div>
     )
 }
