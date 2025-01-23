@@ -87,6 +87,29 @@ const getBloodRequestsByUserId = asyncHandler(async (req, res) => {
     }    
 })
 
+// get blood requests by blood group
+const getBloodRequestsByBloodGroup = asyncHandler(async (req, res) => {
+    try {
+        const { bloodGroup } = req.query;
+
+        // Validate bloodGroup parameter
+        if (!bloodGroup) {
+            return res.status(400).json(
+                new ApiResponse(400, "Blood group is required")
+            );
+        }
+
+        const bloodRequests = await BloodRequest.find({ bloodGroup: bloodGroup });
+        return res.status(200).json(
+            new ApiResponse(200, "Blood requests fetched successfully", bloodRequests)
+        );
+    } catch (error) {
+        return res.status(500).json(
+            new ApiResponse(500, error?.message || "Something went wrong while fetching blood requests")
+        );
+    }
+});
+
 // update blood request status
 const updateBloodRequestStatus = asyncHandler(async (req, res) => {
     try {
@@ -174,7 +197,9 @@ export {
     createBloodRequest, 
     getAllBloodRequests, 
     getBloodRequestById, 
-    getBloodRequestsByUserId, updateBloodRequestStatus, 
+    getBloodRequestsByUserId,
+    getBloodRequestsByBloodGroup, 
+    updateBloodRequestStatus, 
     updateBloodRequest, 
     deleteBloodRequest,
     getBloodRequestsByStatus

@@ -19,10 +19,12 @@ app.use(cookieParser());
 // routers import
 import userRouter from "./routes/user.routes.js";
 import bloodRequestRouter from "./routes/bloodRequest.routes.js";
+import postRouter from "./routes/post.routes.js";
 
 // routers
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/blood-requests", bloodRequestRouter);
+app.use("/api/v1/posts", postRouter);
 
 
 export {app};

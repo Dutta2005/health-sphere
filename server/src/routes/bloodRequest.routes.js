@@ -3,7 +3,9 @@ import {
     createBloodRequest, 
     getAllBloodRequests, 
     getBloodRequestById, 
-    getBloodRequestsByUserId, updateBloodRequestStatus, 
+    getBloodRequestsByUserId,
+    getBloodRequestsByBloodGroup,
+    updateBloodRequestStatus, 
     updateBloodRequest, 
     deleteBloodRequest,
     getBloodRequestsByStatus
@@ -17,6 +19,7 @@ router.use(verifyJWT);
 //api/v1/blood-requests
 router.get("/", getAllBloodRequests);
 router.get("/status", getBloodRequestsByStatus);
+router.get("/blood-group", getBloodRequestsByBloodGroup);
 router.get("/:id", getBloodRequestById);
 router.get("/user/:id", getBloodRequestsByUserId);
 router.post("/create", createBloodRequest);
