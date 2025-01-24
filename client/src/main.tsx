@@ -14,6 +14,7 @@ import Login from './pages/account/Login.tsx'
 import Signup from './pages/account/Signup.tsx'
 import BloodBridge from './pages/BloodBridge.tsx'
 import Discussions from './pages/Discussions.tsx'
+import DiscussionPost from './components/discussion/DiscussionPost.tsx'
 
 const router = createBrowserRouter([
   {
@@ -26,7 +27,13 @@ const router = createBrowserRouter([
         path: 'bloodbridge',
         element: <BloodBridge />
       },
-      { path: 'discussions', element: <Discussions /> },
+      { 
+        path: 'discussions', 
+        element: <Discussions />,
+        children: [
+        ]
+      },
+      { path: 'discussions/:id', element: <DiscussionPost /> }
     ]
   },
   { 
