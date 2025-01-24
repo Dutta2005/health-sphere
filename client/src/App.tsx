@@ -24,7 +24,7 @@ function App() {
   return (
     <ErrorBoundary FallbackComponent={SomethingWrong}>
       <Navbar />
-      <div className='pt-16 bg-light-bg text-light-text dark:bg-dark-bg dark:text-dark-text'><Outlet /></div>
+      <div className='pt-16 bg-light-bg text-light-text dark:bg-dark-bg dark:text-dark-text min-h-screen'><Outlet /></div>
     </ ErrorBoundary>
   )
 }

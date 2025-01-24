@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useParams } from "react-router-dom";
 import { api } from '../../api/api';
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "../ui/card";
 import { Badge } from "../ui/badge";
 import { Clock, User, AlertCircle } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
 import DiscussionPostSkeleton from './DiscussionPostSkeleton';
+import CommentSection from './CommentSection';
 
 interface PostDetail {
     _id: string;
@@ -96,6 +97,9 @@ const DiscussionPost = () => {
                         <p className="text-gray-700 dark:text-gray-300 break-words">{post.content}</p>
                     </div>
                 </CardContent>
+                <CardFooter>
+                    <CommentSection postId={post._id} />
+                </CardFooter>
             </Card>
         </div>
     );
