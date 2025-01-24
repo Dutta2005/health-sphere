@@ -50,7 +50,8 @@ const getAllPosts = asyncHandler(async(req, res) => {
         const posts = await Post.find()
             .sort({ createdAt: -1 }) 
             .skip(skip) 
-            .limit(limit);
+            .limit(limit)
+            .populate("author", "name");
 
         return res.status(200).json(
             new ApiResponse(200, "Posts fetched successfully", {
