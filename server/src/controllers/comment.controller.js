@@ -17,12 +17,12 @@ const getComments = asyncHandler(async (req, res) => {
         : { parentComment: parentCommentId };
 
     const comments = await Comment.find(query)
-        .populate('user', 'name')
+        .populate('user', 'name status')
         .populate({
             path: 'replies',
             populate: {
                 path: 'user',
-                select: 'name'
+                select: 'name status'
             }
         })
         .skip((page - 1) * limit)
