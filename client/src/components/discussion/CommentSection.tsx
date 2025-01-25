@@ -5,6 +5,8 @@ import { Button } from "../ui/button";
 import { Textarea } from "../ui/textarea";
 import { User, MessageSquare, Trash2, Edit2 } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
+import { useSelector } from "react-redux";
+import { RootState } from "../../store/store";
 
 interface Comment {
   _id: string;
@@ -12,6 +14,7 @@ interface Comment {
   user: {
     name: string;
     _id: string;
+    status: string;
   };
   createdAt: string;
   parentComment?: string | null;
@@ -23,6 +26,7 @@ interface CommentSectionProps {
 }
 
 const CommentSection: React.FC<CommentSectionProps> = ({ postId }) => {
+  const userId = useSelector((state: RootState) => state.auth.user?.id);
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState("");
   const [replyTo, setReplyTo] = useState<{
@@ -147,7 +151,11 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId }) => {
 
   const renderComments = (commentList: Comment[]) => {
     return commentList.map((comment) => (
-      <div key={comment._id} className="mb-4 w-full">
+      <div key={comment._id} className={`mb-4 w-full ${comment.user.status === 'doctor' 
+      ? 'bg-green-100/30 dark:bg-green-900/30'
+      : comment.user.status === 'medical student'
+      ? 'bg-blue-100/80 dark:bg-blue-900/30'
+      : ''} p-2 rounded-lg`}>
         {/* Top-level comment rendering */}
         <div className="flex flex-col md:flex-row justify-between items-start">
           <div className="flex items-center space-x-2 mb-2">
@@ -173,7 +181,8 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId }) => {
             >
               <MessageSquare size={14} className="mr-1" /> Reply
             </Button>
-            <Button
+            {userId === comment.user._id && (
+              <Button
               variant="ghost"
               size="sm"
               onClick={() => {
@@ -184,7 +193,9 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId }) => {
             >
               <Edit2 size={14} className="mr-1" /> Edit
             </Button>
-            <Button
+            )}
+            {userId === comment.user._id && (
+              <Button
               variant="ghost"
               size="sm"
               onClick={() => handleDeleteComment(comment._id)}
@@ -192,6 +203,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId }) => {
             >
               <Trash2 size={14} className="mr-1" /> Delete
             </Button>
+            )}
           </div>
         </div>
 
@@ -209,7 +221,11 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId }) => {
         {comment.replies && comment.replies.length > 0 && (
           <div className="ml-4 md:ml-8 border-l-2 border-secondary pl-4 mt-2">
             {comment.replies.map((reply) => (
-              <div key={reply._id} className="mb-2">
+              <div key={reply._id} className={`mb-2 ${reply.user.status === 'doctor' 
+                ? 'bg-green-100/30 dark:bg-green-900/30'
+                : reply.user.status === 'medical student'
+                ? 'bg-blue-100/80 dark:bg-blue-900/30'
+                : ''} p-2 rounded-lg`}>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2 mb-1">
                     <User
@@ -224,7 +240,8 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId }) => {
                     </span>
                   </div>
                   <div className="flex space-x-2">
-                    <Button
+                    { userId === reply.user._id && (
+                      <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => {
@@ -235,7 +252,9 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId }) => {
                     >
                       <Edit2 size={12} className="mr-1" />Edit
                     </Button>
-                    <Button
+                    )}
+                    { userId === reply.user._id && (
+                      <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => handleDeleteComment(reply._id)}
@@ -243,6 +262,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId }) => {
                     >
                       <Trash2 size={12} className="mr-1" />Delete
                     </Button>
+                    )}
                   </div>
                 </div>
 
