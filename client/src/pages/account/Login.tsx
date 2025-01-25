@@ -14,10 +14,12 @@ import { Label } from "../../components/ui/label";
 import { api } from "../../api/api";
 import { login } from "../../store/authSlice";
 import { useDispatch } from "react-redux";
+import { useToast } from "../../hooks/use-toast";
 
 const Login = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const { toast } = useToast()
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -43,6 +45,12 @@ const Login = () => {
       
       if (response.status === 200) {       
         dispatch(login(response.data.data.user));
+        toast({
+          title: "Login Successful",
+          description: "You have successfully logged in.",
+          variant: "default",
+          duration: 2000
+        })
         navigate("/");
       } else{
         setError(
