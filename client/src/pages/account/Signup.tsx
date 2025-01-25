@@ -164,15 +164,25 @@ const Signup = () => {
       if (response.status === 201) {
         toast({
           title: "Registration Successful",
-          description: "Your account has been created.",
+          description: "Your account has been created. Please log in.",
           variant: "default",
+          duration: 5000,
         });
         navigate("/login");
-      } else {
+      } else if(response.status === 409) {
+        toast({
+          title: "Registration Failed",
+          description: response.data.message || "User already exists",
+          variant: "destructive",
+          duration: 5000,
+        });
+      }
+       else {
         toast({
           title: "Registration Failed",
           description: response.data.message || "Something went wrong",
           variant: "destructive",
+          duration: 5000,
         });
       }
     } catch (error: any) {
@@ -180,6 +190,7 @@ const Signup = () => {
         title: "Registration Failed",
         description: error.response?.data?.message || "Something went wrong",
         variant: "destructive",
+        duration: 5000,
       });
     }
   };
