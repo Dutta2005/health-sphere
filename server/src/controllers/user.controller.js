@@ -114,14 +114,14 @@ const loginUser = asyncHandler(async (req, res) => {
         httpOnly: true,
         secure: true,
         sameSite: "none",
-        maxAge: parseInt(process.env.ACCESS_TOKEN_EXPIARY)
+        maxAge: parseInt(process.env.ACCESS_TOKEN_EXPIARY) * 1000
     }
 
     const refreshOptions = {
         httpOnly: true,
         secure: true,
         sameSite: "none",
-        maxAge: parseInt(process.env.REFRESH_TOKEN_EXPIARY)
+        maxAge: parseInt(process.env.REFRESH_TOKEN_EXPIARY) * 1000
    }
 
     return res
