@@ -18,7 +18,7 @@ function Logoutbtn() {
                 toast({
                     title: "Logout Successful",
                     description: "You have successfully logged out.",
-                    variant: "default",
+                    variant: "success",
                     duration: 3000
                 })
                 navigate('/', {replace: true})
