@@ -1,7 +1,8 @@
 import { Router } from "express";
 import {
-    initiateRegistration,
-    completeRegistration,
+    // initiateRegistration,
+    // completeRegistration,
+    registerOrganization,
     loginOrganization,
     logoutOrganization,
     refreshAccessToken,
@@ -15,13 +16,15 @@ const router = Router();
 
 // /api/v1/organizations
 
-router.post("/refresh-token", refreshAccessToken);
-router.post("/initial-register", initiateRegistration);
+
+router.post("/register", registerOrganization);
 router.post("/login", loginOrganization);
-router.post("/complete-register", verifyJWT, completeRegistration);
+
+
+router.post("/logout", verifyJWT, logoutOrganization);
+router.post("/refresh-token", refreshAccessToken);
 
 router.use(verifyJWT)
-router.post("/logout", logoutOrganization);
 router.post("/change-password", changePassword);
 router.patch("/update", updateOrganization);
 router.get("/profile", getOrganizationProfile);

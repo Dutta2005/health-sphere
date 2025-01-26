@@ -7,6 +7,9 @@ import jwt from "jsonwebtoken";
 const generateAccessAndRefreshTokens = async (orgId) => {
     try {
         const organization = await Organization.findById(orgId);
+        if (!organization) {
+            throw new ApiError(404, "Organization not found");
+        }
         const accessToken = organization.generateAccessToken();
         const refreshToken = organization.generateRefreshToken();
 
@@ -19,13 +22,114 @@ const generateAccessAndRefreshTokens = async (orgId) => {
     }
 };
 
-// Initial Registration Step
-const initiateRegistration = asyncHandler(async (req, res) => {
-    const { name, email, password } = req.body;
+// // Initial Registration Step
+// const initiateRegistration = asyncHandler(async (req, res) => {
+//     const { name, email, password } = req.body;
+
+//     // Validation
+//     if (!name || !email || !password) {
+//         throw new ApiError(400, "Name, email, and password are required");
+//     }
+
+//     // Check existing organization
+//     const existedOrg = await Organization.findOne({ email });
+
+//     if (existedOrg) {
+//         throw new ApiError(409, "Organization already exists with this email");
+//     }
+
+//     // Create initial organization registration
+//     const organization = await Organization.create({
+//         name,
+//         email,
+//         password,
+//         registrationComplete: false
+//     });
+
+//     return res.status(200).json(
+//         new ApiResponse(200, "Initial registration successful", {
+//             orgId: organization._id
+//         })
+//     );
+// });
+
+// // Complete Registration Step
+// const completeRegistration = asyncHandler(async (req, res) => {
+//     const { 
+//         orgId, 
+//         description, 
+//         type, 
+//         website 
+//     } = req.body;
+
+//     if (!orgId) {
+//         throw new ApiError(400, "Organization ID is required");
+//     }
+
+//     if (!description) {
+//         throw new ApiError(400, "Description is required");
+//     }
+
+//     if (!type) {
+//         throw new ApiError(400, "Organization type is required");
+//     }
+
+//     const organization = await Organization.findByIdAndUpdate(
+//         orgId,
+//         {
+//             $set: {
+//                 description,
+//                 type,
+//                 website: website || null,
+//                 registrationComplete: true
+//             }
+//         },
+//         { new: true, runValidators: true }
+//     );
+
+//     if (!organization) {
+//         throw new ApiError(404, "Organization not found");
+//     }
+
+//     // Generate tokens after complete registration
+//     const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(organization._id);
+
+//     const loggedInOrganization = await Organization.findById(organization._id).select("-password -refreshToken");
+
+//     const accessOptions = {
+//         httpOnly: true,
+//         secure: true,
+//         sameSite: "none",
+//         maxAge: parseInt(process.env.ACCESS_TOKEN_EXPIARY) * 1000
+//     };
+
+//     const refreshOptions = {
+//         httpOnly: true,
+//         secure: true,
+//         sameSite: "none",
+//         maxAge: parseInt(process.env.REFRESH_TOKEN_EXPIARY) * 1000  
+//     }
+
+//     return res
+//         .status(200)
+//         .cookie("accessToken", accessToken, accessOptions)
+//         .cookie("refreshToken", refreshToken, refreshOptions)
+//         .json(
+//             new ApiResponse(200, "Organization registration completed successfully", {
+//                 organization: loggedInOrganization,
+//                 accessToken,
+//                 refreshToken
+//             })
+//         );
+// });
+
+// Register Organization
+const registerOrganization = asyncHandler(async (req, res) => {
+    const { name, email, password, description, type, website } = req.body;
 
     // Validation
-    if (!name || !email || !password) {
-        throw new ApiError(400, "Name, email, and password are required");
+    if (!name || !email || !password || !description || !type) {
+        throw new ApiError(400, "Name, email, password, description, and type are required");
     }
 
     // Check existing organization
@@ -35,90 +139,28 @@ const initiateRegistration = asyncHandler(async (req, res) => {
         throw new ApiError(409, "Organization already exists with this email");
     }
 
-    // Create initial organization registration
+    // Create organization
     const organization = await Organization.create({
         name,
         email,
         password,
-        registrationComplete: false
+        description,
+        type,
+        website: website || null
     });
 
+    if (!organization) {
+        throw new ApiError(500, "Something went wrong while registering organization");
+    }
+
+
     return res.status(200).json(
-        new ApiResponse(200, "Initial registration successful", {
-            orgId: organization._id
+        new ApiResponse(200, "Organization registration successful", {
+            organization
         })
     );
-});
-
-// Complete Registration Step
-const completeRegistration = asyncHandler(async (req, res) => {
-    const { 
-        orgId, 
-        description, 
-        type, 
-        website 
-    } = req.body;
-
-    if (!orgId) {
-        throw new ApiError(400, "Organization ID is required");
-    }
-
-    if (!description) {
-        throw new ApiError(400, "Description is required");
-    }
-
-    if (!type) {
-        throw new ApiError(400, "Organization type is required");
-    }
-
-    const organization = await Organization.findByIdAndUpdate(
-        orgId,
-        {
-            $set: {
-                description,
-                type,
-                website: website || null,
-                registrationComplete: true
-            }
-        },
-        { new: true, runValidators: true }
-    );
-
-    if (!organization) {
-        throw new ApiError(404, "Organization not found");
-    }
-
-    // Generate tokens after complete registration
-    const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(organization._id);
-
-    const loggedInOrganization = await Organization.findById(organization._id).select("-password -refreshToken");
-
-    const accessOptions = {
-        httpOnly: true,
-        secure: true,
-        sameSite: "none",
-        maxAge: parseInt(process.env.ACCESS_TOKEN_EXPIARY) * 1000
-    };
-
-    const refreshOptions = {
-        httpOnly: true,
-        secure: true,
-        sameSite: "none",
-        maxAge: parseInt(process.env.REFRESH_TOKEN_EXPIARY) * 1000  
-    }
-
-    return res
-        .status(200)
-        .cookie("accessToken", accessToken, accessOptions)
-        .cookie("refreshToken", refreshToken, refreshOptions)
-        .json(
-            new ApiResponse(200, "Organization registration completed successfully", {
-                organization: loggedInOrganization,
-                accessToken,
-                refreshToken
-            })
-        );
-});
+   
+})
 
 // Login Organization
 const loginOrganization = asyncHandler(async (req, res) => {
@@ -219,7 +261,8 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
     
         const options = {
             httpOnly: true,
-            secure: process.env.NODE_ENV === "production"
+            // secure: process.env.NODE_ENV === "production"
+            secure: true
         };
     
         return res
@@ -286,8 +329,9 @@ const getOrganizationProfile = asyncHandler(async (req, res) => {
 })
 
 export {
-    initiateRegistration,
-    completeRegistration,
+    // initiateRegistration,
+    // completeRegistration,
+    registerOrganization,
     loginOrganization,
     logoutOrganization,
     refreshAccessToken,

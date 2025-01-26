@@ -21,22 +21,24 @@ const organizationSchema = new mongoose.Schema({
     },
     description: {
         type: String,
-        required: function() { 
-            return this.registrationComplete; 
-        },
+        // required: function() { 
+        //     return this.registrationComplete; 
+        // },
+        required: true,
         trim: true
     },
     type: {
         type: String,
         enum: ['hospital', 'ngo', 'research', 'other'],
-        required: function() { 
-            return this.registrationComplete; 
-        }
+        // required: function() { 
+        //     return this.registrationComplete; 
+        // }
+        required: true
     },
-    registrationComplete: {
-        type: Boolean,
-        default: false
-    },
+    // registrationComplete: {
+    //     type: Boolean,
+    //     default: false
+    // },
     website: {
         type: String,
         default: null,
@@ -48,7 +50,8 @@ const organizationSchema = new mongoose.Schema({
         }
     },
     refreshToken: {
-        type: String
+        type: String,
+        default: null
     }
 }, {
     timestamps: true
@@ -69,19 +72,23 @@ organizationSchema.methods.isPasswordMatched = async function(password) {
 
 // Access token generation method
 organizationSchema.methods.generateAccessToken = function() {
+    const expiresIn = process.env.ACCESS_TOKEN_EXPIARY || '86400s';
+    console.log(`Generating access token with expiration: ${expiresIn}`);
     return jwt.sign(
         {_id: this._id, email: this.email, name: this.name}, 
         process.env.ACCESS_TOKEN_SECRET, 
-        {expiresIn: process.env.ACCESS_TOKEN_EXPIARY}
+        {expiresIn}
     );
 };
 
 // Refresh token generation method
 organizationSchema.methods.generateRefreshToken = function() {
+    const expiresIn = process.env.REFRESH_TOKEN_EXPIARY || '864000s';
+    console.log(`Generating refresh token with expiration: ${expiresIn}`);
     return jwt.sign(
         {_id: this._id}, 
         process.env.REFRESH_TOKEN_SECRET, 
-        {expiresIn: process.env.REFRESH_TOKEN_EXPIARY}
+        {expiresIn}
     );
 };
 

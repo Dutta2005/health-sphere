@@ -9,8 +9,8 @@ const app = express();
 
 console.log(process.env.CORS_ORIGIN);
 app.use(cors({
-    // origin: 'http://localhost:5173' || process.env.CORS_ORIGIN,
-    origin: 'https://health-sphere-eight.vercel.app',
+    origin: 'http://localhost:5173' || process.env.CORS_ORIGIN,
+    // origin: 'https://health-sphere-eight.vercel.app',
     credentials: true
 }))
 
@@ -26,6 +26,7 @@ import bloodRequestRouter from "./routes/bloodRequest.routes.js";
 import postRouter from "./routes/post.routes.js";
 import commentRouter from "./routes/comment.routes.js";
 import organizationRouter from "./routes/organization.routes.js"
+import orgPostRouter from "./routes/orgPost.routes.js"
 
 // routers
 app.use("/api/v1/users", userRouter);
@@ -33,6 +34,7 @@ app.use("/api/v1/blood-requests", bloodRequestRouter);
 app.use("/api/v1/posts", postRouter);
 app.use("/api/v1/comments", commentRouter);
 app.use("/api/v1/organizations", organizationRouter)
+app.use("/api/v1/org-posts", orgPostRouter)
 
 
 export {app};
