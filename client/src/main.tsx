@@ -44,10 +44,11 @@ const router = createBrowserRouter([
     path: 'organisation',
     element: <Layout />,
     children: [
-      { path: 'register', element: <OrganizationSignup /> },
-      { path: 'login', element: <OrganizationLogin /> }
+      
     ]
   },
+  { path: 'register', element: <OrganizationSignup /> },
+  { path: 'signin', element: <OrganizationLogin /> },
   { 
     path: 'login',
     element: <Login />

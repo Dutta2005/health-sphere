@@ -7,8 +7,8 @@ import { useToast } from "../../hooks/use-toast"
 
 
 function OrgLogoutBtn() {
-    const dispatch = useDispatch()
     const navigate = useNavigate()
+    const dispatch = useDispatch()
     const { toast } = useToast()
     const signOut = async() => {
         try {

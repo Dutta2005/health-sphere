@@ -5,13 +5,22 @@ interface User {
   name: string;
 }
 
+interface Organization {
+  id: string;
+  name: string;
+}
+
 interface AuthState {
   user: User | null;
+  organization: Organization | null;
+  role: "user" | "organization" | null;
   isAuthenticated: boolean;
 }
 
 const initialState: AuthState = {
   user: null,
+  organization: null,
+  role: null,
   isAuthenticated: false,
 };
 
@@ -24,15 +33,27 @@ const authSlice = createSlice({
         id: action.payload._id,
         name: action.payload.name,
       };
-
+      state.organization = null;
+      state.role = "user";
+      state.isAuthenticated = true;
+    },
+    loginOrganization: (state, action) => {
+      state.organization = {
+        id: action.payload._id,
+        name: action.payload.name,
+      };
+      state.user = null;
+      state.role = "organization";
       state.isAuthenticated = true;
     },
     logout: (state) => {
       state.user = null;
+      state.organization = null;
+      state.role = null;
       state.isAuthenticated = false;
     },
   },
 });
 
-export const { login, logout } = authSlice.actions;
+export const { login, loginOrganization, logout } = authSlice.actions;
 export default authSlice.reducer;
