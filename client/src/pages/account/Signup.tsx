@@ -13,6 +13,7 @@ import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
 import { useToast } from "../../hooks/use-toast";
 import { api } from "../../api/api";
+import { State, City } from "country-state-city";
 
 interface FormData {
   name: string;
@@ -57,6 +58,12 @@ const Signup = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
+  const [selectedState, setSelectedState] = useState<any>(null);
+  // @ts-ignore
+  const [selectedCity, setSelectedCity] = useState<any>(null);
+
+  const states = State.getStatesOfCountry("IN");
+
   const [formData, setFormData] = useState<FormData>({
     name: "",
     phone: "",
@@ -86,18 +93,15 @@ const Signup = () => {
   ) => {
     const { id, value } = e.target;
 
-    // Handle checkbox separately
     const isCheckbox = (e.target as HTMLInputElement).type === "checkbox";
     const inputValue = isCheckbox
       ? (e.target as HTMLInputElement).checked
       : value;
 
     setFormData((prev) => {
-      // Handle nested fields
       if (id.includes(".")) {
         const [parent, child] = id.split(".");
 
-        // Type-safe nested update
         return {
           ...prev,
           [parent]:
@@ -109,7 +113,6 @@ const Signup = () => {
         };
       }
 
-      // Handle top-level fields
       return {
         ...prev,
         [id]: inputValue,
@@ -117,12 +120,42 @@ const Signup = () => {
     });
   };
 
+  const handleStateChange = (stateName: string) => {
+    const state = states.find((s) => s.name === stateName);
+    setSelectedState(state);
+
+    setFormData((prev) => ({
+      ...prev,
+      address: {
+        ...prev.address,
+        state: stateName,
+        city: "",
+      },
+    }));
+  };
+
+  const handleCityChange = (cityName: string) => {
+    const city = City.getCitiesOfState("IN", selectedState.isoCode).find(
+      (c) => c.name === cityName
+    );
+    setSelectedCity(city);
+
+    setFormData((prev) => ({
+      ...prev,
+      address: {
+        ...prev.address,
+        city: cityName,
+      },
+    }));
+  };
+
   const validateForm = (): boolean => {
     const newErrors: Errors = {};
 
-    // Validation logic remains the same as previous implementation
     if (!formData.name) newErrors.name = "Name is required";
     if (!formData.phone) newErrors.phone = "Phone number is required";
+    if (formData.phone.length !== 10)
+      newErrors.phone = "Phone number must be 10 digits";
     if (!formData.email) newErrors.email = "Email is required";
     if (!formData.password) newErrors.password = "Password is required";
     if (formData.password !== formData.confirmPassword) {
@@ -145,7 +178,6 @@ const Signup = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     if (!validateForm()) return;
 
     try {
@@ -165,33 +197,33 @@ const Signup = () => {
         toast({
           title: "Registration Successful",
           description: "Your account has been created. Please log in.",
-          variant: "default",
+          variant: "success",
           duration: 5000,
         });
         navigate("/login");
-      } else if(response.status === 409) {
+      } else {
         toast({
           title: "Registration Failed",
-          description: response.data.message || "User already exists",
+          description: "Something went wrong",
           variant: "destructive",
-          duration: 5000,
-        });
-      }
-       else {
-        toast({
-          title: "Registration Failed",
-          description: response.data.message || "Something went wrong",
-          variant: "destructive",
-          duration: 5000,
+          duration: 2000,
         });
       }
     } catch (error: any) {
-      toast({
-        title: "Registration Failed",
-        description: error.response?.data?.message || "Something went wrong",
-        variant: "destructive",
-        duration: 5000,
-      });
+      if (error.response.status === 409)
+        toast({
+          title: "Registration Failed",
+          description: "Email or phone number already exists",
+          variant: "destructive",
+          duration: 5000,
+        });
+      else
+        toast({
+          title: "Registration Failed",
+          description: "Something went wrong",
+          variant: "destructive",
+          duration: 5000,
+        });
     }
   };
 
@@ -275,14 +307,24 @@ const Signup = () => {
 
             <div className="grid grid-cols-3 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="address.state">State</Label>
-                <Input
-                  id="address.state"
+                <Label>State</Label>
+                <select
                   value={formData.address.state}
-                  onChange={handleChange}
-                  placeholder="Maharashtra"
-                  className={`h-11 ${errors.state ? "border-red-500" : ""}`}
-                />
+                  onChange={(e) => handleStateChange(e.target.value)}
+                  className={`w-full h-11 p-2 border rounded bg-white dark:bg-dark-bg 
+            text-light-text dark:text-dark-text
+            border-secondary 
+            focus:ring-accent focus:border-accent ${
+              errors.state ? "border-red-500" : ""
+            }`}
+                >
+                  <option value="">Select State</option>
+                  {states.map((state) => (
+                    <option key={state.isoCode} value={state.name}>
+                      {state.name}
+                    </option>
+                  ))}
+                </select>
                 {errors.state && (
                   <p className="text-red-500 text-sm">{errors.state}</p>
                 )}
@@ -294,7 +336,7 @@ const Signup = () => {
                   id="address.district"
                   value={formData.address.district}
                   onChange={handleChange}
-                  placeholder="Mumbai"
+                  placeholder="Enter District"
                   className={`h-11 ${errors.district ? "border-red-500" : ""}`}
                 />
                 {errors.district && (
@@ -304,13 +346,27 @@ const Signup = () => {
 
               <div className="space-y-2">
                 <Label htmlFor="address.city">City</Label>
-                <Input
-                  id="address.city"
+                <select
                   value={formData.address.city}
-                  onChange={handleChange}
-                  placeholder="Mumbai City"
-                  className={`h-11 ${errors.city ? "border-red-500" : ""}`}
-                />
+                  onChange={(e) => handleCityChange(e.target.value)}
+                  disabled={!formData.address.state}
+                  className={`w-full h-11 p-2 border rounded bg-white dark:bg-dark-bg 
+            text-light-text dark:text-dark-text
+            border-secondary 
+            focus:ring-accent focus:border-accent ${
+              errors.city ? "border-red-500" : ""
+            }`}
+                >
+                  <option value="">Select City</option>
+                  {selectedState &&
+                    City.getCitiesOfState("IN", selectedState.isoCode).map(
+                      (city) => (
+                        <option key={city.name} value={city.name}>
+                          {city.name}
+                        </option>
+                      )
+                    )}
+                </select>
                 {errors.city && (
                   <p className="text-red-500 text-sm">{errors.city}</p>
                 )}
@@ -320,15 +376,34 @@ const Signup = () => {
             <div className="grid grid-cols-3 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="info.bloodGroup">Blood Group</Label>
-                <Input
+                <select
                   id="info.bloodGroup"
                   value={formData.info.bloodGroup}
                   onChange={handleChange}
-                  placeholder="A+"
-                  className={`h-11 ${
-                    errors.bloodGroup ? "border-red-500" : ""
-                  }`}
-                />
+                  className={`w-full h-11 p-2 border rounded bg-white dark:bg-dark-bg 
+                text-light-text dark:text-dark-text
+                border-secondary 
+                focus:ring-accent focus:border-primary ${
+                  errors.bloodGroup ? "border-red-500" : ""
+                }`}
+                >
+                  <option value="">Blood Group</option>
+                  {[
+                    "A+",
+                    "A-",
+                    "B+",
+                    "B-",
+                    "AB+",
+                    "AB-",
+                    "O+",
+                    "O-",
+                    "Others",
+                  ].map((group) => (
+                    <option key={group} value={group}>
+                      {group}
+                    </option>
+                  ))}
+                </select>
                 {errors.bloodGroup && (
                   <p className="text-red-500 text-sm">{errors.bloodGroup}</p>
                 )}
@@ -370,14 +445,14 @@ const Signup = () => {
               value={formData.status}
               onChange={handleChange}
               className={`
-    w-full h-11 
-    border rounded 
-    bg-white dark:bg-dark-bg 
-    text-light-text dark:text-dark-text
-    border-secondary 
-    focus:ring-accent focus:border-accent
-    ${errors.status ? "border-red-500" : ""}
-  `}
+              w-full h-11 
+              border rounded 
+            bg-white dark:bg-dark-bg 
+            text-light-text dark:text-dark-text
+            border-secondary 
+            focus:ring-accent focus:border-accent
+              ${errors.status ? "border-red-500" : ""}
+            `}
             >
               <option value="doctor">Doctor</option>
               <option value="medical student">Medical Student</option>

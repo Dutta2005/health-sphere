@@ -15,6 +15,7 @@ import Signup from './pages/account/Signup.tsx'
 import BloodBridge from './pages/BloodBridge.tsx'
 import Discussions from './pages/Discussions.tsx'
 import DiscussionPost from './components/discussion/DiscussionPost.tsx'
+import { Toaster } from './components/ui/toaster.tsx'
 
 const router = createBrowserRouter([
   {
@@ -50,6 +51,7 @@ let persistor = persistStore(store);
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
+    <Toaster />
     <Provider store={store}>
       <PersistGate persistor={persistor}>
         <RouterProvider router={router} />

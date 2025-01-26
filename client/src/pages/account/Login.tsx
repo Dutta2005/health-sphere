@@ -24,7 +24,7 @@ const Login = () => {
     email: "",
     password: "",
   });
-  const [error, setError] = useState("");
+  // const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -37,7 +37,6 @@ const Login = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
     setIsLoading(true);
 
     try {
@@ -48,22 +47,35 @@ const Login = () => {
         toast({
           title: "Login Successful",
           description: "You have successfully logged in.",
-          variant: "default",
+          variant: "success",
           duration: 2000
         })
         navigate("/");
       } else{
-        setError(
-          response.data.message || 
-          "An error occurred during login. Please try again."
-        );
+        toast({
+          title: "Login Failed",
+          description: response.data.message || "An error occurred during login. Please try again.",
+          variant: "destructive",
+          duration: 2000
+        })
       }
 
     } catch (err: any) {
-      setError(
-        err.response?.data?.message || 
-        "An error occurred during login. Please try again."
-      );
+      if(err.response.status === 401){
+      toast({
+        title: "Login Failed",
+        description: "Invalid email or password.",
+        variant: "destructive",
+        duration: 5000
+      })
+    } else {
+      toast({
+        title: "Login Failed",
+        description: "Something went wrong",
+        variant: "destructive",
+        duration: 5000
+      })
+    }
     } finally {
       setIsLoading(false);
     }
@@ -85,9 +97,9 @@ const Login = () => {
 
         <CardContent>
           <form onSubmit={handleSubmit} className="flex flex-col space-y-4">
-            {error && (
+            {/* {error && (
               <div className="text-red-500 text-sm text-center">{error}</div>
-            )}
+            )} */}
             
             <div className="space-y-2">
               <Label
