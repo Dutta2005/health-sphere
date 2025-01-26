@@ -16,6 +16,8 @@ import BloodBridge from './pages/BloodBridge.tsx'
 import Discussions from './pages/Discussions.tsx'
 import DiscussionPost from './components/discussion/DiscussionPost.tsx'
 import { Toaster } from './components/ui/toaster.tsx'
+import Layout from './pages/organisation/Layout.tsx'
+import OrganizationSignup from './pages/organisation/auth/OrganizationSignup.tsx'
 
 const router = createBrowserRouter([
   {
@@ -35,6 +37,13 @@ const router = createBrowserRouter([
         ]
       },
       { path: 'discussions/:id', element: <DiscussionPost /> }
+    ]
+  },
+  {
+    path: 'organisation',
+    element: <Layout />,
+    children: [
+      { path: 'register', element: <OrganizationSignup /> },
     ]
   },
   { 
