@@ -1,6 +1,7 @@
 import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Link, useNavigate } from "react-router-dom";
 
 import { Button } from "../../../components/ui/button";
 import {
@@ -10,17 +11,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../../../components/ui/select";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "../../../components/ui/card";
+import { Input } from "../../../components/ui/input";
+import { Card, CardHeader, CardTitle, CardFooter } from "../../../components/ui/card";
 import { api } from "../../../api/api";
-import { useNavigate } from "react-router";
 import { useToast } from "../../../hooks/use-toast";
 
-// Zod validation schema
+// Zod validation schema (same as previous)
 const organizationSchema = z.object({
   name: z
     .string()
@@ -96,95 +92,118 @@ export default function OrganizationSignup() {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-light-bg dark:bg-dark-bg dark:text-dark-text">
-      <Card className="w-full max-w-md p-6">
-        <CardHeader>
-          <CardTitle className="text-center text-2xl font-bold text-primary">
-            Organization Signup
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            {/* Organization Name */}
-            <div className="space-y-2">
-              <label className="block text-sm font-medium">
-                Organization Name
-              </label>
-              <input
-                {...register("name")}
-                className="w-full px-3 py-2 border rounded-md dark:bg-dark-bg dark:text-dark-text"
-                placeholder="Enter organization name"
-              />
-              {errors.name && (
-                <p className="text-red-500 text-xs">{errors.name.message}</p>
-              )}
+    <div className="min-h-screen w-full bg-light-bg dark:bg-dark-bg/90 flex justify-center items-center p-4 overflow-x-hidden">
+      <div className="absolute top-0 left-0 w-1/2 h-screen bg-primary/85 transform -skew-x-12 -translate-x-20 hidden md:block" />
+
+      <Card className="w-full max-w-4xl bg-white/95 dark:bg-dark-bg/95 backdrop-blur-sm shadow-2xl border-0 z-10 relative 
+        flex flex-col md:flex-row">
+        {/* Left Column - Hidden on mobile, visible on md screens and up */}
+        <div className="hidden md:flex w-1/2 p-8 bg-primary/10 dark:bg-primary/5 flex-col justify-center space-y-6">
+          <h2 className="text-3xl font-bold text-light-text dark:text-dark-text">
+            Join Our Journey
+          </h2>
+          <p className="text-gray-600 dark:text-dark-text/80">
+            start making an impact today.
+          </p>
+          <div className="space-y-2 text-sm">
+            <p className="flex items-center space-x-2">
+              <span className="text-primary">✓</span>
+              <span>Secure and confidential registration</span>
+            </p>
+            <p className="flex items-center space-x-2">
+              <span className="text-primary">✓</span>
+              <span>Spread the word about your campaign</span>
+            </p>
+            <p className="flex items-center space-x-2">
+              <span className="text-primary">✓</span>
+              <span>Get support from our dedicated team</span>
+            </p>
+          </div>
+        </div>
+
+        {/* Right Column - Full width on mobile, half width on md screens */}
+        <div className="w-full md:w-1/2 p-6 md:p-8">
+          <CardHeader className="p-0 mb-6">
+            <CardTitle className="text-2xl font-bold text-primary text-center">
+              Organization Signup
+            </CardTitle>
+          </CardHeader>
+          
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="block text-sm font-medium">
+                  Organization Name
+                </label>
+                <Input
+                  {...register("name")}
+                  placeholder="Enter organization name"
+                  className="dark:bg-dark-bg dark:text-dark-text"
+                />
+                {errors.name && (
+                  <p className="text-red-500 text-xs">{errors.name.message}</p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <label className="block text-sm font-medium">
+                  Organization Type
+                </label>
+                <Controller
+                  name="type"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <SelectTrigger className="w-full dark:bg-dark-bg dark:text-dark-text">
+                        <SelectValue placeholder="Select type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="hospital">Hospital</SelectItem>
+                        <SelectItem value="ngo">NGO</SelectItem>
+                        <SelectItem value="research">Research</SelectItem>
+                        <SelectItem value="other">Other</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+                {errors.type && (
+                  <p className="text-red-500 text-xs">{errors.type.message}</p>
+                )}
+              </div>
             </div>
 
-            {/* Email */}
             <div className="space-y-2">
               <label className="block text-sm font-medium">Email</label>
-              <input
+              <Input
                 type="email"
                 {...register("email")}
-                className="w-full px-3 py-2 border rounded-md dark:bg-dark-bg dark:text-dark-text"
                 placeholder="Enter email"
+                className="dark:bg-dark-bg dark:text-dark-text"
               />
               {errors.email && (
                 <p className="text-red-500 text-xs">{errors.email.message}</p>
               )}
             </div>
 
-            {/* Password */}
             <div className="space-y-2">
               <label className="block text-sm font-medium">Password</label>
-              <input
+              <Input
                 type="password"
                 {...register("password")}
-                className="w-full px-3 py-2 border rounded-md dark:bg-dark-bg dark:text-dark-text"
                 placeholder="Enter password"
+                className="dark:bg-dark-bg dark:text-dark-text"
               />
               <p className="text-xs text-gray-500">
-                Password must be at least 8 characters with uppercase,
-                lowercase, and number
+                8+ characters with uppercase, lowercase, and number
               </p>
               {errors.password && (
-                <p className="text-red-500 text-xs">
-                  {errors.password.message}
-                </p>
+                <p className="text-red-500 text-xs">{errors.password.message}</p>
               )}
             </div>
 
-            {/* Organization Type */}
-            <div className="space-y-2">
-              <label className="block text-sm font-medium">
-                Organization Type
-              </label>
-              <Controller
-                name="type"
-                control={control}
-                render={({ field }) => (
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Select organization type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="hospital">Hospital</SelectItem>
-                      <SelectItem value="ngo">NGO</SelectItem>
-                      <SelectItem value="research">Research</SelectItem>
-                      <SelectItem value="other">Other</SelectItem>
-                    </SelectContent>
-                  </Select>
-                )}
-              />
-              {errors.type && (
-                <p className="text-red-500 text-xs">{errors.type.message}</p>
-              )}
-            </div>
-
-            {/* Description */}
             <div className="space-y-2">
               <label className="block text-sm font-medium">
                 Organization Description
@@ -201,15 +220,16 @@ export default function OrganizationSignup() {
                 </p>
               )}
             </div>
+
             <div className="space-y-2">
               <label className="block text-sm font-medium">
                 Website (Optional)
               </label>
-              <input
+              <Input
                 type="url"
                 {...register("website")}
-                className="w-full px-3 py-2 border rounded-md"
                 placeholder="https://www.yourorganization.com"
+                className="dark:bg-dark-bg dark:text-dark-text"
               />
               {errors.website && (
                 <p className="text-red-500 text-xs">{errors.website.message}</p>
@@ -218,12 +238,24 @@ export default function OrganizationSignup() {
 
             <Button
               type="submit"
-              className="w-full bg-primary hover:bg-primary/90"
+              className="w-full bg-primary hover:bg-primary/90 dark:bg-primary dark:hover:bg-primary/90 text-white dark:text-white"
             >
               Register Organization
             </Button>
           </form>
-        </CardContent>
+
+          <CardFooter className="text-center mt-4 p-0">
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              Already have an account?{" "}
+              <Link
+                to="/signin"
+                className="text-primary hover:text-secondary transition-colors"
+              >
+                Log in
+              </Link>
+            </p>
+          </CardFooter>
+        </div>
       </Card>
     </div>
   );
