@@ -18,6 +18,7 @@ import DiscussionPost from './components/discussion/DiscussionPost.tsx'
 import { Toaster } from './components/ui/toaster.tsx'
 import Layout from './pages/organisation/Layout.tsx'
 import OrganizationSignup from './pages/organisation/auth/OrganizationSignup.tsx'
+import OrganizationLogin from './pages/organisation/auth/OrganisationLogin.tsx'
 
 const router = createBrowserRouter([
   {
@@ -44,6 +45,7 @@ const router = createBrowserRouter([
     element: <Layout />,
     children: [
       { path: 'register', element: <OrganizationSignup /> },
+      { path: 'login', element: <OrganizationLogin /> }
     ]
   },
   { 
