@@ -36,6 +36,8 @@ type InitialRegistrationData = z.infer<typeof InitialRegistrationSchema>;
 type CompleteRegistrationData = z.infer<typeof CompleteRegistrationSchema>;
 
 const OrganizationSignup = forwardRef<HTMLDivElement>((props, ref) => {
+  console.log(props);
+  
   const [step, setStep] = useState<'initial' | 'complete'>('initial');
   const [orgId, setOrgId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
