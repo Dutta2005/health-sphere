@@ -1,187 +1,173 @@
-import { useState, forwardRef } from 'react';
-import { z } from 'zod';
-import { useForm, Controller } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { api } from '../../../api/api';
+import { useForm, Controller } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 
-import { Label } from "../../../components/ui/label";
-import { Input } from "../../../components/ui/input";
 import { Button } from "../../../components/ui/button";
-import { Textarea } from "../../../components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../../components/ui/select";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../../../components/ui/card";
+import { api } from "../../../api/api";
+import { useNavigate } from "react-router";
+import { useToast } from "../../../hooks/use-toast";
 
-// Zod Schema for Initial Registration
-const InitialRegistrationSchema = z.object({
-  name: z.string().min(2, { message: "Organization name must be at least 2 characters" }),
+// Zod validation schema
+const organizationSchema = z.object({
+  name: z
+    .string()
+    .min(2, { message: "Organization name must be at least 2 characters" }),
   email: z.string().email({ message: "Invalid email address" }),
-  password: z.string()
+  password: z
+    .string()
     .min(8, { message: "Password must be at least 8 characters" })
-    .refine(
-      (password) => /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(password),
-      { message: "Password must include uppercase, lowercase, number, and special character" }
-    )
-});
-
-// Zod Schema for Complete Registration
-const CompleteRegistrationSchema = z.object({
-  description: z.string().min(10, { message: "Description must be at least 10 characters" }),
-  type: z.enum(['hospital', 'ngo', 'research', 'other'], {
-    errorMap: () => ({ message: "Please select a valid organization type" })
+    .regex(/[A-Z]/, {
+      message: "Password must contain at least one uppercase letter",
+    })
+    .regex(/[a-z]/, {
+      message: "Password must contain at least one lowercase letter",
+    })
+    .regex(/[0-9]/, { message: "Password must contain at least one number" }),
+  description: z
+    .string()
+    .min(10, { message: "Description must be at least 10 characters" })
+    .max(500, { message: "Description cannot exceed 500 characters" }),
+  type: z.enum(["hospital", "ngo", "research", "other"], {
+    required_error: "Please select an organization type",
   }),
-  website: z.string().url({ message: "Invalid website URL" }).optional().or(z.literal(''))
+  website: z
+    .union([z.string().url({ message: "Invalid website URL" }), z.literal("")])
+    .optional()
+    .transform((value) => value || undefined),
 });
 
-// Combined Types
-type InitialRegistrationData = z.infer<typeof InitialRegistrationSchema>;
-type CompleteRegistrationData = z.infer<typeof CompleteRegistrationSchema>;
+type OrganizationSignupData = z.infer<typeof organizationSchema>;
 
-const OrganizationSignup = forwardRef<HTMLDivElement>((props, ref) => {
-  console.log(props);
-  
-  const [step, setStep] = useState<'initial' | 'complete'>('initial');
-  const [orgId, setOrgId] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-
-  const {
-    register: registerInitial,
-    handleSubmit: handleInitialSubmit,
-    formState: { errors: initialErrors }
-  } = useForm<InitialRegistrationData>({
-    resolver: zodResolver(InitialRegistrationSchema)
-  });
-
+export default function OrganizationSignup() {
+  const navigate = useNavigate();
+  const { toast } = useToast();
   const {
     control,
-    register: registerComplete,
-    handleSubmit: handleCompleteSubmit,
-    formState: { errors: completeErrors }
-  } = useForm<CompleteRegistrationData>({
-    resolver: zodResolver(CompleteRegistrationSchema)
+    handleSubmit,
+    register,
+    formState: { errors },
+  } = useForm<OrganizationSignupData>({
+    resolver: zodResolver(organizationSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      password: "",
+      description: "",
+      type: undefined,
+      website: "",
+    },
   });
 
-  const onInitialSubmit = async (data: InitialRegistrationData) => {
+  const onSubmit = async (data: OrganizationSignupData) => {
     try {
-      setError(null);
-      const result = await api.post('/organizations/initial-register', data);
-      
-      if (result.status === 200) {
-        setOrgId(result.data.orgId);
-        setStep('complete');
-      } else {
-        setError(result.statusText);
+      const response = await api.post("/organizations/register", data);
+      if (response.status === 200) {
+        toast({
+          title: "Registration Successful",
+          description: "You have successfully registered as an organization.",
+          variant: "success",
+          duration: 2000,
+        });
+        navigate("/organisation/login");
       }
-    } catch (error) {
-      setError('Registration failed. Please try again.');
-    }
-  };
-
-  const onCompleteSubmit = async (data: CompleteRegistrationData) => {
-    try {
-      setError(null);
-      const completeData = {
-        ...data,
-        orgId: orgId
-      };
-
-      const result = await api.post('/organizations/complete-register', completeData);
-      
-      if (result.status === 200) {
-        // Redirect or show success message
-        console.log('Registration complete');
-      } else {
-        setError(result.statusText);
-      }
-    } catch (error) {
-      console.log(error);
-      
-      setError('Complete registration failed. Please try again.');
+    } catch (error: any) {
+      toast({
+        title: "Registration Failed",
+        description:
+          error.response?.statusText ||
+          "An error occurred during registration. Please try again.",
+        variant: "destructive",
+        duration: 4000,
+      });
     }
   };
 
   return (
-    <div ref={ref} className="min-h-screen bg-light-bg flex items-center justify-center px-4 py-8">
-      <div className="w-full max-w-md bg-white shadow-md rounded-lg p-8">
-        <h2 className="text-2xl font-bold text-primary mb-6 text-center">
-          {step === 'initial' ? 'Initial Registration' : 'Complete Your Profile'}
-        </h2>
-
-        {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
-            {error}
-          </div>
-        )}
-
-        {step === 'initial' && (
-          <form onSubmit={handleInitialSubmit(onInitialSubmit)} className="space-y-4">
-            <div className="grid w-full max-w-sm items-center gap-1.5">
-              <Label htmlFor="name">Organization Name</Label>
-              <Input 
-                {...registerInitial('name')} 
-                type="text" 
-                id="name" 
-                placeholder="Enter organization name" 
+    <div className="flex justify-center items-center min-h-screen bg-light-bg dark:bg-dark-bg dark:text-dark-text">
+      <Card className="w-full max-w-md p-6">
+        <CardHeader>
+          <CardTitle className="text-center text-2xl font-bold text-primary">
+            Organization Signup
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            {/* Organization Name */}
+            <div className="space-y-2">
+              <label className="block text-sm font-medium">
+                Organization Name
+              </label>
+              <input
+                {...register("name")}
+                className="w-full px-3 py-2 border rounded-md dark:bg-dark-bg dark:text-dark-text"
+                placeholder="Enter organization name"
               />
-              {initialErrors.name && (
-                <p className="text-red-500 text-xs mt-1">{initialErrors.name.message}</p>
+              {errors.name && (
+                <p className="text-red-500 text-xs">{errors.name.message}</p>
               )}
             </div>
 
-            <div className="grid w-full max-w-sm items-center gap-1.5">
-              <Label htmlFor="email">Email Address</Label>
-              <Input 
-                {...registerInitial('email')} 
-                type="email" 
-                id="email" 
-                placeholder="Enter your email" 
+            {/* Email */}
+            <div className="space-y-2">
+              <label className="block text-sm font-medium">Email</label>
+              <input
+                type="email"
+                {...register("email")}
+                className="w-full px-3 py-2 border rounded-md dark:bg-dark-bg dark:text-dark-text"
+                placeholder="Enter email"
               />
-              {initialErrors.email && (
-                <p className="text-red-500 text-xs mt-1">{initialErrors.email.message}</p>
+              {errors.email && (
+                <p className="text-red-500 text-xs">{errors.email.message}</p>
               )}
             </div>
 
-            <div className="grid w-full max-w-sm items-center gap-1.5">
-              <Label htmlFor="password">Password</Label>
-              <Input 
-                {...registerInitial('password')} 
-                type="password" 
-                id="password" 
-                placeholder="Enter password" 
+            {/* Password */}
+            <div className="space-y-2">
+              <label className="block text-sm font-medium">Password</label>
+              <input
+                type="password"
+                {...register("password")}
+                className="w-full px-3 py-2 border rounded-md dark:bg-dark-bg dark:text-dark-text"
+                placeholder="Enter password"
               />
-              {initialErrors.password && (
-                <p className="text-red-500 text-xs mt-1">{initialErrors.password.message}</p>
+              <p className="text-xs text-gray-500">
+                Password must be at least 8 characters with uppercase,
+                lowercase, and number
+              </p>
+              {errors.password && (
+                <p className="text-red-500 text-xs">
+                  {errors.password.message}
+                </p>
               )}
             </div>
 
-            <Button type="submit" className="w-full">Continue Registration</Button>
-          </form>
-        )}
-
-        {step === 'complete' && (
-          <form onSubmit={handleCompleteSubmit(onCompleteSubmit)} className="space-y-4">
-            <div className="grid w-full items-center gap-1.5">
-              <Label htmlFor="description">Organization Description</Label>
-              <Textarea 
-                {...registerComplete('description')}
-                id="description"
-                placeholder="Describe your organization"
-                rows={4}
-              />
-              {completeErrors.description && (
-                <p className="text-red-500 text-xs mt-1">{completeErrors.description.message}</p>
-              )}
-            </div>
-
-            <div className="grid w-full items-center gap-1.5">
-              <Label>Organization Type</Label>
+            {/* Organization Type */}
+            <div className="space-y-2">
+              <label className="block text-sm font-medium">
+                Organization Type
+              </label>
               <Controller
                 name="type"
                 control={control}
                 render={({ field }) => (
-                  <Select 
-                    onValueChange={field.onChange} 
-                    value={field.value}
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className="w-full">
                       <SelectValue placeholder="Select organization type" />
                     </SelectTrigger>
                     <SelectContent>
@@ -193,30 +179,52 @@ const OrganizationSignup = forwardRef<HTMLDivElement>((props, ref) => {
                   </Select>
                 )}
               />
-              {completeErrors.type && (
-                <p className="text-red-500 text-xs mt-1">{completeErrors.type.message}</p>
+              {errors.type && (
+                <p className="text-red-500 text-xs">{errors.type.message}</p>
               )}
             </div>
 
-            <div className="grid w-full items-center gap-1.5">
-              <Label htmlFor="website">Website (Optional)</Label>
-              <Input 
-                {...registerComplete('website')} 
-                type="text" 
-                id="website" 
-                placeholder="Enter website URL" 
+            {/* Description */}
+            <div className="space-y-2">
+              <label className="block text-sm font-medium">
+                Organization Description
+              </label>
+              <textarea
+                {...register("description")}
+                className="w-full px-3 py-2 border rounded-md resize-none dark:bg-dark-bg dark:text-dark-text"
+                placeholder="Brief description of your organization"
+                rows={4}
               />
-              {completeErrors.website && (
-                <p className="text-red-500 text-xs mt-1">{completeErrors.website.message}</p>
+              {errors.description && (
+                <p className="text-red-500 text-xs">
+                  {errors.description.message}
+                </p>
+              )}
+            </div>
+            <div className="space-y-2">
+              <label className="block text-sm font-medium">
+                Website (Optional)
+              </label>
+              <input
+                type="url"
+                {...register("website")}
+                className="w-full px-3 py-2 border rounded-md"
+                placeholder="https://www.yourorganization.com"
+              />
+              {errors.website && (
+                <p className="text-red-500 text-xs">{errors.website.message}</p>
               )}
             </div>
 
-            <Button type="submit" className="w-full">Complete Registration</Button>
+            <Button
+              type="submit"
+              className="w-full bg-primary hover:bg-primary/90"
+            >
+              Register Organization
+            </Button>
           </form>
-        )}
-      </div>
+        </CardContent>
+      </Card>
     </div>
   );
-});
-
-export default OrganizationSignup;
+}
