@@ -9,8 +9,8 @@ const app = express();
 
 console.log(process.env.CORS_ORIGIN);
 app.use(cors({
-    origin: 'http://localhost:5173' || process.env.CORS_ORIGIN,
-    // origin: 'https://health-sphere-eight.vercel.app',
+    // origin: 'http://localhost:5173' || process.env.CORS_ORIGIN,
+    origin: 'https://health-sphere-eight.vercel.app',
     credentials: true
 }))
 
