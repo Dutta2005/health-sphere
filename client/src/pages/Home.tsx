@@ -6,7 +6,7 @@ function Home() {
     return (
         <div>
             <h1 className="mb-6">Home</h1>
-            <Link to="/signin" className="bg-accent text-white rounded-lg px-4 py-2 ">Organisation Login</Link>
+            <Link to="/organisation" className="bg-accent text-white rounded-lg px-4 py-2 ">Organisation Login</Link>
             {isAuthenticated ? (
                 <p>Welcome to the home page!</p>
             ) : (

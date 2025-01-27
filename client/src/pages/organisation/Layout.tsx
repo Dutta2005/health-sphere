@@ -1,18 +1,38 @@
-import { Link, Outlet } from "react-router"
-import OrgLogoutBtn from "../../components/organisation/OrgLogoutBtn"
+import { Outlet } from "react-router-dom"
+import Sidebar from "../../components/organisation/navbar/Sidebar"
 import { useSelector } from "react-redux"
 import { RootState } from "../../store/store"
+import { useEffect } from "react"
 
 function Layout() {
     let isLoggedIn = useSelector((state: RootState) => state.auth.isAuthenticated)
     const role = useSelector((state: RootState) => state.auth.role)
     isLoggedIn = isLoggedIn && role === "organization"
+    const theme = useSelector((state: RootState) => state.theme.theme)
+    useEffect(() => {
+        if (theme === "dark") {
+            document.body.classList.add("dark")
+        } else {
+            document.body.classList.remove("dark")
+        }
+    }, [theme])
+    
     return (
-        <div>
-            <h1 className="text-4xl text-center">Organisation Layout</h1>
-            { isLoggedIn && <OrgLogoutBtn /> }
-            { !isLoggedIn && <Link to="/signin" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Login</Link> }
+        <div className="bg-light-bg dark:bg-dark-bg dark:text-dark-text min-h-screen">
+            <div className="flex justify-between px-2 py-2 fixed w-full top-0 backdrop-blur-md z-50"> 
+            <div className="flex-shrink-0">
+              <div className="flex flex-col">
+                <h1 className="text-2xl font-bold bg-gradient-to-r from-accent to-primary bg-clip-text text-transparent">
+                  Health<span className="font-extrabold">Sphere</span>
+                </h1>
+                <p className="text-xs text-light-text dark:text-dark-text text-right">for Organizations</p>
+              </div>
+            </div>
+                <Sidebar isLoggedIn={isLoggedIn} theme={theme} />
+            </div>
+            <div className="pt-16">
             <Outlet />
+            </div>
         </div>
     )
 }

@@ -34,7 +34,7 @@ function OrgLogoutBtn() {
     }
     return (
         <button className="w-full flex items-center justify-center gap-2 text-red-600" onClick={signOut}>
-            <span>Logout</span>
+            <span className="text-lg font-semibold">Logout</span>
             <LogOut className="w-5 h-5" />
         </button>
     )
