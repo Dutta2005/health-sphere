@@ -61,7 +61,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isLoggedIn, theme }) => {
           {isLoggedIn ? (
             <div className="space-y-2">
               <NavLink 
-                to={`/organisation/profile/0`} 
+                to={`/organisation/org-profile/0`} 
                 className={navLinkClasses}
                 end
               >
