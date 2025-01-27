@@ -1,11 +1,18 @@
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardFooter, CardHeader } from "../../components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+} from "../../components/ui/card";
 import { Button } from "../../components/ui/button";
 import { api } from "../../api/api";
 import { Landmark, ChevronLeft, ChevronRight } from "lucide-react";
 import { Link } from "react-router";
 import { formatDistanceToNow } from "date-fns";
 import PostSkeleton from "../../components/organisation/post/PostSkeleton";
+import { useSelector } from "react-redux";
+import { RootState } from "../../store/store";
 
 interface Post {
   _id: string;
@@ -18,38 +25,48 @@ interface Post {
   createdAt: string;
 }
 
-
 const PostCard = ({ post }: { post: Post }) => {
+  const role = useSelector((state: RootState) => state.auth.role);
   const truncateContent = (content: string, limit: number) => {
     return content.length > limit ? `${content.slice(0, limit)}...` : content;
   };
 
   return (
-    <Card className="rounded-lg shadow-md hover:shadow-lg transition-all duration-300 border-l-4 border-l-accent">
-      <CardHeader>
-        <Link to={`/organisation/profile/${post.organization._id}`} className="flex items-center gap-3 mb-1 -ml-2">
-          <div className="bg-accent/10 p-2 rounded-full">
-            <Landmark size={16} className="text-accent" />
-          </div>
-          <h2 className="font-medium text-sm text-secondary-foreground">
-            {post.organization.name}
+    <Link
+      to={`/${role === "organization" ? "organization/" : ""}post/${post._id}`}
+    >
+      <Card className="rounded-lg shadow-md hover:shadow-lg transition-all duration-300 border-l-4 border-l-accent mb-2">
+        <CardHeader>
+          <Link
+            to={`/${
+              role === "organization" ? "organization/" : ""
+            }org-profile/${post.organization._id}`}
+            className="flex items-center gap-3 mb-1 -ml-2"
+          >
+            <div className="bg-accent/10 p-2 rounded-full">
+              <Landmark size={16} className="text-accent" />
+            </div>
+            <h2 className="font-medium text-sm text-secondary-foreground">
+              {post.organization.name}
+            </h2>
+          </Link>
+          <h2 className="text-lg font-semibold text-foreground hover:text-accent transition-colors duration-200">
+            {post.title}
           </h2>
-        </Link>
-        <h2 className="text-lg font-semibold text-foreground hover:text-accent transition-colors duration-200">
-          {post.title}
-        </h2>
-      </CardHeader>
-      <Link to={`/organisation/post/${post._id}`}>
-      <CardContent className="-mt-3">
-        <p className="text-muted-foreground leading-relaxed">
-          {truncateContent(post.content, 50)}
-        </p>
-      </CardContent>
-      <CardFooter className="-mt-2">
-        <p className="text-xs text-gray-500 text-muted-foreground">{formatDistanceToNow(new Date(post.createdAt), { addSuffix: true })}</p>
-      </CardFooter>
-      </Link>
-    </Card>
+        </CardHeader>
+
+        <CardContent className="-mt-3">
+          <p className="text-muted-foreground leading-relaxed">
+            {truncateContent(post.content, 50)}
+          </p>
+        </CardContent>
+        <CardFooter className="-mt-2">
+          <p className="text-xs text-gray-500 text-muted-foreground">
+            {formatDistanceToNow(new Date(post.createdAt), { addSuffix: true })}
+          </p>
+        </CardFooter>
+      </Card>
+    </Link>
   );
 };
 

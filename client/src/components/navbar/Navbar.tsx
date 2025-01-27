@@ -94,6 +94,22 @@ const Navbar = () => {
                   </NavLink>
                 </NavigationMenuItem>
               )}
+              {isAuthenticated && (
+                <NavigationMenuItem>
+                  <NavLink
+                    to="/posts"
+                    className={({ isActive }) =>
+                      `hover:text-accent transition-colors ${
+                        isActive
+                          ? "text-accent"
+                          : "dark:text-dark-text"
+                      }`
+                    }
+                  >
+                    Campaigns
+                  </NavLink>
+                </NavigationMenuItem>
+              )}
               {!isAuthenticated && (
                 <>
                   <NavigationMenuItem>

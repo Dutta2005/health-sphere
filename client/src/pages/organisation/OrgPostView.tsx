@@ -12,6 +12,8 @@ import {
 import { Alert, AlertDescription, AlertTitle } from "../../components/ui/alert";
 import PostSkeleton from "../../components/organisation/post/PostSkeleton";
 import CommentSection from "../../components/discussion/CommentSection";
+import { RootState } from "../../store/store";
+import { useSelector } from "react-redux";
 
 interface Post {
   _id: string;
@@ -30,6 +32,7 @@ function OrgPostView() {
   const [post, setPost] = useState<Post | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const role = useSelector((state: RootState) => state.auth.role);
 
   useEffect(() => {
     const getPost = async () => {
@@ -76,7 +79,7 @@ function OrgPostView() {
         <CardHeader className="space-y-6 pb-6">
           <div className="flex items-center justify-between">
             <Link
-              to={`/organisation/profile/${post.organization._id}`}
+              to={`/${role === "organization" ? "organization/" : ""}org-profile/${post.organization._id}`}
               className="flex items-center gap-3 group"
             >
               <div className="bg-accent/10 p-3 rounded-full group-hover:bg-accent/20 transition-colors duration-200">
