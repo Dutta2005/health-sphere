@@ -22,6 +22,7 @@ import OrganizationLogin from './pages/organisation/auth/OrganisationLogin.tsx'
 import OrgPost from './pages/organisation/OrgPost.tsx'
 import OrgProfile from './pages/organisation/OrgProfile.tsx'
 import OrgPostView from './pages/organisation/OrgPostView.tsx'
+import OrgHome from './pages/organisation/OrgHome.tsx'
 
 const router = createBrowserRouter([
   {
@@ -34,6 +35,10 @@ const router = createBrowserRouter([
         path: 'bloodbridge',
         element: <BloodBridge />
       },
+      { path: 'posts', element: <OrgPost /> },
+      { path: 'org-profile/:id', element: <OrgProfile /> },
+      { path: 'post/:id', element: <OrgPostView /> },
+
       { 
         path: 'discussions', 
         element: <Discussions />,
@@ -47,9 +52,10 @@ const router = createBrowserRouter([
     path: 'organisation',
     element: <Layout />,
     children: [
+      { path: '', element: <OrgHome /> },
       { path: '*' , element: <Error404 /> },
       { path: 'posts', element: <OrgPost /> },
-      { path: 'profile/:id', element: <OrgProfile /> },
+      { path: 'org-profile/:id', element: <OrgProfile /> },
       { path: 'post/:id', element: <OrgPostView /> }
     ]
   },
