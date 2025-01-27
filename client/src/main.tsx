@@ -19,6 +19,8 @@ import { Toaster } from './components/ui/toaster.tsx'
 import Layout from './pages/organisation/Layout.tsx'
 import OrganizationSignup from './pages/organisation/auth/OrganizationSignup.tsx'
 import OrganizationLogin from './pages/organisation/auth/OrganisationLogin.tsx'
+import OrgPost from './pages/organisation/OrgPost.tsx'
+import OrgProfile from './pages/organisation/OrgProfile.tsx'
 
 const router = createBrowserRouter([
   {
@@ -44,7 +46,9 @@ const router = createBrowserRouter([
     path: 'organisation',
     element: <Layout />,
     children: [
-      
+      { path: '*' , element: <Error404 /> },
+      { path: 'posts', element: <OrgPost /> },
+      { path: 'profile/:id', element: <OrgProfile /> }
     ]
   },
   { path: 'register', element: <OrganizationSignup /> },
