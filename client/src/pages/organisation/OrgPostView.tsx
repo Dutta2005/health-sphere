@@ -79,7 +79,7 @@ function OrgPostView() {
         <CardHeader className="space-y-6 pb-6">
           <div className="flex items-center justify-between">
             <Link
-              to={`/${role === "organization" ? "organization/" : ""}org-profile/${post.organization._id}`}
+              to={`/${role === "organization" ? "organisation/" : ""}org-profile/${post.organization._id}`}
               className="flex items-center gap-3 group"
             >
               <div className="bg-accent/10 p-3 rounded-full group-hover:bg-accent/20 transition-colors duration-200">
