@@ -3,7 +3,7 @@ import { api } from "../../api/api";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Button } from "../ui/button";
 import { Textarea } from "../ui/textarea";
-import { User, MessageSquare, Trash2, Edit2 } from "lucide-react";
+import { User, Building2, MessageSquare, Trash2, Edit2 } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store/store";
@@ -11,10 +11,14 @@ import { RootState } from "../../store/store";
 interface Comment {
   _id: string;
   content: string;
-  user: {
-    name: string;
+  user?: {
     _id: string;
-    status: string;
+    name: string;
+    status?: string;
+  };
+  organization?: {
+    _id: string;
+    name: string;
   };
   createdAt: string;
   parentComment?: string | null;
@@ -26,7 +30,8 @@ interface CommentSectionProps {
 }
 
 const CommentSection: React.FC<CommentSectionProps> = ({ postId }) => {
-  const userId = useSelector((state: RootState) => state.auth.user?.id);
+  const user = useSelector((state: RootState) => state.auth.user);
+  const organization = useSelector((state: RootState) => state.auth.organization);
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState("");
   const [replyTo, setReplyTo] = useState<{
@@ -107,11 +112,51 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId }) => {
     });
   };
 
+  const canModifyComment = (comment: Comment) => {
+    if (user && comment.user) {
+      return user.id === comment.user._id;
+    }
+    if (organization && comment.organization) {
+      return organization.id === comment.organization._id;
+    }
+    return false;
+  };
+
+  const getCommentAuthorDetails = (comment: Comment) => {
+    if (comment.user) {
+      return {
+        name: comment.user.name,
+        status: comment.user.status,
+        icon: <User size={16} className="text-light-text/50 dark:text-dark-text/50" />,
+        type: 'user'
+      };
+    }
+    if (comment.organization) {
+      return {
+        name: comment.organization.name,
+        status: 'organization',
+        icon: <Building2 size={16} className="text-light-text/50 dark:text-dark-text/50" />,
+        type: 'organization'
+      };
+    }
+    return {
+      name: 'Unknown',
+      status: '',
+      icon: <User size={16} className="text-light-text/50 dark:text-dark-text/50" />,
+      type: 'unknown'
+    };
+  };
+
+  const getCommentBackground = ( status?: string) => {
+    if (status === 'doctor') return 'bg-green-100/30 dark:bg-green-900/30';
+    if (status === 'medical student') return 'bg-blue-100/80 dark:bg-blue-900/30';
+    return '';
+  };
+
   const renderCommentInput = (
     commentId: string | null,
     parentId: string | null,
     isEditing: boolean = false
-    // isReply: boolean = false
   ) => {
     const placeholder = isEditing
       ? "Edit your comment..."
@@ -120,16 +165,12 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId }) => {
       : "Add a comment...";
     const value = isEditing ? editContent : newComment;
     const onChange = isEditing
-      ? (e: React.ChangeEvent<HTMLTextAreaElement>) =>
-          setEditContent(e.target.value)
-      : (e: React.ChangeEvent<HTMLTextAreaElement>) =>
-          setNewComment(e.target.value);
-    const onSubmit = isEditing
-      ? () => handleUpdateComment(commentId!)
-      : handleAddComment;
+      ? (e: React.ChangeEvent<HTMLTextAreaElement>) => setEditContent(e.target.value)
+      : (e: React.ChangeEvent<HTMLTextAreaElement>) => setNewComment(e.target.value);
+    const onSubmit = isEditing ? () => handleUpdateComment(commentId!) : handleAddComment;
 
     return (
-      <div className="mt-2 bg-light-bg dark:bg-dark-bg p-1 rounded-lg ">
+      <div className="mt-2 bg-light-bg dark:bg-dark-bg p-1 rounded-lg">
         <Textarea
           placeholder={placeholder}
           value={value}
@@ -150,135 +191,75 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId }) => {
   };
 
   const renderComments = (commentList: Comment[]) => {
-    return commentList.map((comment) => (
-      <div key={comment._id} className={`mb-4 w-full ${comment.user.status === 'doctor' 
-      ? 'bg-green-100/30 dark:bg-green-900/30'
-      : comment.user.status === 'medical student'
-      ? 'bg-blue-100/80 dark:bg-blue-900/30'
-      : ''} p-2 rounded-lg`}>
-        {/* Top-level comment rendering */}
-        <div className="flex flex-col md:flex-row justify-between items-start">
-          <div className="flex items-center space-x-2 mb-2">
-            <User
-              size={16}
-              className="text-light-text/50 dark:text-dark-text/50"
-            />
-            <span className="font-medium text-sm text-light-text dark:text-dark-text">
-              {comment.user.name}
-            </span>
-            <span className="text-xs text-light-text/70 dark:text-dark-text/70">
-              {formatDate(comment.createdAt)}
-            </span>
-          </div>
-          <div className="flex space-x-2 flex-wrap justify-end">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() =>
-                setReplyTo({ commentId: comment._id, parentId: null })
-              }
-              className="text-light-text/70 dark:text-dark-text/70 hover:bg-light-bg/50 dark:hover:bg-dark-bg/50"
-            >
-              <MessageSquare size={14} className="mr-1" /> Reply
-            </Button>
-            {userId === comment.user._id && (
+    return commentList.map((comment) => {
+      const authorDetails = getCommentAuthorDetails(comment);
+      const bgColor = getCommentBackground(authorDetails.type);
+
+      return (
+        <div key={comment._id} className={`mb-4 w-full ${bgColor} p-2 rounded-lg`}>
+          <div className="flex flex-col md:flex-row justify-between items-start">
+            <div className="flex items-center space-x-2 mb-2">
+              {authorDetails.icon}
+              <span className="font-medium text-sm text-light-text dark:text-dark-text">
+                {authorDetails.name}
+              </span>
+              <span className="text-xs text-light-text/70 dark:text-dark-text/70">
+                {formatDate(comment.createdAt)}
+              </span>
+            </div>
+            <div className="flex space-x-2 flex-wrap justify-end">
               <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => {
-                setEditingCommentId(comment._id);
-                setEditContent(comment.content);
-              }}
-              className="text-light-text/70 dark:text-dark-text/70 hover:bg-light-bg/50 dark:hover:bg-dark-bg/50"
-            >
-              <Edit2 size={14} className="mr-1" /> Edit
-            </Button>
-            )}
-            {userId === comment.user._id && (
-              <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => handleDeleteComment(comment._id)}
-              className="text-primary/70 hover:bg-primary/10"
-            >
-              <Trash2 size={14} className="mr-1" /> Delete
-            </Button>
-            )}
+                variant="ghost"
+                size="sm"
+                onClick={() => setReplyTo({ commentId: comment._id, parentId: null })}
+                className="text-light-text/70 dark:text-dark-text/70 hover:bg-light-bg/50 dark:hover:bg-dark-bg/50"
+              >
+                <MessageSquare size={14} className="mr-1" /> Reply
+              </Button>
+              {canModifyComment(comment) && (
+                <>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      setEditingCommentId(comment._id);
+                      setEditContent(comment.content);
+                    }}
+                    className="text-light-text/70 dark:text-dark-text/70 hover:bg-light-bg/50 dark:hover:bg-dark-bg/50"
+                  >
+                    <Edit2 size={14} className="mr-1" /> Edit
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleDeleteComment(comment._id)}
+                    className="text-primary/70 hover:bg-primary/10"
+                  >
+                    <Trash2 size={14} className="mr-1" /> Delete
+                  </Button>
+                </>
+              )}
+            </div>
           </div>
+
+          {editingCommentId === comment._id ? (
+            renderCommentInput(comment._id, null, true)
+          ) : (
+            <p className="text-sm text-light-text dark:text-dark-text">
+              {comment.content}
+            </p>
+          )}
+
+          {replyTo.commentId === comment._id && renderCommentInput(replyTo.commentId, null)}
+
+          {comment.replies && comment.replies.length > 0 && (
+            <div className="ml-4 md:ml-8 border-l-2 border-secondary pl-4 mt-2">
+              {renderComments(comment.replies)}
+            </div>
+          )}
         </div>
-
-        {editingCommentId === comment._id ? (
-          renderCommentInput(comment._id, null, true)
-        ) : (
-          <p className="text-sm text-light-text dark:text-dark-text">
-            {comment.content}
-          </p>
-        )}
-
-        {replyTo.commentId === comment._id &&
-          renderCommentInput(replyTo.commentId, null)}
-
-        {comment.replies && comment.replies.length > 0 && (
-          <div className="ml-4 md:ml-8 border-l-2 border-secondary pl-4 mt-2">
-            {comment.replies.map((reply) => (
-              <div key={reply._id} className={`mb-2 ${reply.user.status === 'doctor' 
-                ? 'bg-green-100/30 dark:bg-green-900/30'
-                : reply.user.status === 'medical student'
-                ? 'bg-blue-100/80 dark:bg-blue-900/30'
-                : ''} p-2 rounded-lg`}>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2 mb-1">
-                    <User
-                      size={14}
-                      className="text-light-text/50 dark:text-dark-text/50"
-                    />
-                    <span className="font-medium text-xs text-light-text dark:text-dark-text">
-                      {reply.user.name}
-                    </span>
-                    <span className="text-xs text-light-text/70 dark:text-dark-text/70">
-                      {formatDate(reply.createdAt)}
-                    </span>
-                  </div>
-                  <div className="flex space-x-2">
-                    { userId === reply.user._id && (
-                      <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => {
-                        setEditingCommentId(reply._id);
-                        setEditContent(reply.content);
-                      }}
-                      className="text-light-text/70 dark:text-dark-text/70 hover:bg-light-bg/50 dark:hover:bg-dark-bg/50"
-                    >
-                      <Edit2 size={12} className="mr-1" />Edit
-                    </Button>
-                    )}
-                    { userId === reply.user._id && (
-                      <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleDeleteComment(reply._id)}
-                      className="text-primary/70 hover:bg-primary/10"
-                    >
-                      <Trash2 size={12} className="mr-1" />Delete
-                    </Button>
-                    )}
-                  </div>
-                </div>
-
-                {editingCommentId === reply._id ? (
-                  renderCommentInput(reply._id, null, true)
-                ) : (
-                  <p className="text-xs text-light-text dark:text-dark-text">
-                    {reply.content}
-                  </p>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-    ));
+      );
+    });
   };
 
   return (
@@ -296,7 +277,14 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId }) => {
           </Alert>
         )}
 
-        {renderCommentInput(null, null)}
+        {(user || organization) ? (
+          renderCommentInput(null, null)
+        ) : (
+          <Alert className="mb-4">
+            <AlertTitle>Authentication Required</AlertTitle>
+            <AlertDescription>Please sign in to comment</AlertDescription>
+          </Alert>
+        )}
 
         <div className="space-y-4 mt-6 max-w-2xl mx-auto">
           {comments.length === 0 ? (

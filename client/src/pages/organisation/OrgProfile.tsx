@@ -4,7 +4,11 @@ import { api } from "../../api/api";
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
 import { Button } from "../../components/ui/button";
 import { Skeleton } from "../../components/ui/skeleton";
+import { Alert, AlertDescription, AlertTitle } from "../../components/ui/alert";
 import { format, isValid } from "date-fns";
+import { useParams } from "react-router";
+import { useSelector } from "react-redux";
+import { RootState } from "../../store/store";
 
 interface OrgProfileData {
   _id: string;
@@ -18,26 +22,48 @@ interface OrgProfileData {
 }
 
 function OrgProfile() {
+  const orgId = useParams<{ id: string }>().id;
+  const loggedInId = useSelector((state: RootState) => state.auth.organization?.id);
   const [orgProfile, setOrgProfile] = useState<OrgProfileData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const getOrgProfile = async () => {
     try {
       setIsLoading(true);
-      const response = await api.get(`/organizations/profile`);      
+      setError(null); // Reset error state
+      const response = await api.get(`/organizations/profile`);
       if (response.status === 200) {
         setOrgProfile(response.data.data);
       }
-    } catch (error: any) {
-      console.error(error);
+    } catch (err: any) {
+      setError("Failed to fetch organization profile. Please try again later.");
+      console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const getOrgProfileById = async () => {
+    try {
+      setIsLoading(true);
+      setError(null); // Reset error state
+      const response = await api.get(`/organizations/profile/${orgId}`);
+      if (response.status === 200) {
+        setOrgProfile(response.data.data);
+      }
+    } catch (err: any) {
+      setError("Failed to fetch organization profile by ID. Please try again later.");
+      console.error(err);
     } finally {
       setIsLoading(false);
     }
   };
 
   useEffect(() => {
-    getOrgProfile();
-  }, []);
+    if (orgId === "0") getOrgProfile();
+    else getOrgProfileById();
+  }, [orgId]);
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -58,6 +84,19 @@ function OrgProfile() {
             <Skeleton className="h-32" />
           </div>
         </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="max-w-3xl mx-auto mt-6">
+        <Alert variant="destructive">
+          <div>
+            <AlertTitle>Error</AlertTitle>
+            <AlertDescription>{error}</AlertDescription>
+          </div>
+        </Alert>
       </div>
     );
   }
@@ -136,10 +175,12 @@ function OrgProfile() {
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
               <span className="text-xl">About</span>
-              <Button variant="outline" size="sm" className="gap-2">
-                <Edit className="w-4 h-4" />
-                Edit Profile
-              </Button>
+              {loggedInId === orgProfile._id && (
+                <Button variant="outline" size="sm" className="gap-2">
+                  <Edit className="w-4 h-4" />
+                  Edit Profile
+                </Button>
+              )}
             </CardTitle>
           </CardHeader>
           <CardContent>

@@ -21,6 +21,7 @@ import OrganizationSignup from './pages/organisation/auth/OrganizationSignup.tsx
 import OrganizationLogin from './pages/organisation/auth/OrganisationLogin.tsx'
 import OrgPost from './pages/organisation/OrgPost.tsx'
 import OrgProfile from './pages/organisation/OrgProfile.tsx'
+import OrgPostView from './pages/organisation/OrgPostView.tsx'
 
 const router = createBrowserRouter([
   {
@@ -48,7 +49,8 @@ const router = createBrowserRouter([
     children: [
       { path: '*' , element: <Error404 /> },
       { path: 'posts', element: <OrgPost /> },
-      { path: 'profile/:id', element: <OrgProfile /> }
+      { path: 'profile/:id', element: <OrgProfile /> },
+      { path: 'post/:id', element: <OrgPostView /> }
     ]
   },
   { path: 'register', element: <OrganizationSignup /> },
