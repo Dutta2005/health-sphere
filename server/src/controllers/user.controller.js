@@ -309,6 +309,19 @@ const getCurrentUser = asyncHandler(async (req, res) => {
     );
 });
 
+// Get user by id
+const getUserById = asyncHandler(async (req, res) => {
+    const user = await User.findById(req.params.id).select("-password -refreshToken -v -updatedAt");
+
+    if (!user) {
+        throw new ApiError(404, "User not found");
+    }
+
+    return res.status(200).json(
+        new ApiResponse(200, "User fetched successfully", user)
+    );
+});
+
 export {
     registerUser,
     loginUser,
@@ -318,5 +331,6 @@ export {
     updateUser,
     searchDonors,
     updateDonationStatus,
-    getCurrentUser
+    getCurrentUser,
+    getUserById
 };
