@@ -2,8 +2,49 @@ import { BloodRequest } from "../models/bloodRequest.model.js";
 import { ApiError } from "../utils/apiError.js";
 import { ApiResponse } from "../utils/apiResponse.js";
 import { asyncHandler } from "../utils/asynchandler.js";
+import { User } from "../models/user.model.js"; // Assuming you have a User model
+import { Notification } from "../models/notification.model.js"; // Notification model
+import { getIO } from "../utils/webSocket.js"; // Import WebSocket instance
+
+
 
 // craete a new blood request
+// const createBloodRequest = asyncHandler(async (req, res) => {
+//     try {
+//         const { bloodGroup, urgency, message, status, contactDetails, address } = req.body;
+    
+//         if (!bloodGroup || !urgency || !status || !contactDetails || !address) {
+//             throw new ApiError(400, "All fields are required");
+//         }
+    
+//         if (!req.user) {
+//             throw new ApiError(401, "Unauthorized request");
+//         }
+    
+//         const bloodRequest = await BloodRequest.create({
+//             userId: req.user._id,
+//             bloodGroup,
+//             urgency,
+//             message: message || "Urgent blood required",
+//             contactDetails,
+//             status,
+//             address
+//         });
+    
+//         const savedBloodRequest = await bloodRequest.save();
+    
+//         return res.status(201).json(
+//             new ApiResponse(201, "Blood request created successfully", {
+//                 bloodRequest: savedBloodRequest
+//             })
+//         );
+//     } catch (error) {
+//         return res.status(500).json(
+//             new ApiResponse(500, error?.message || "Something went wrong while creating blood request")
+//         )
+//     }
+// })
+
 const createBloodRequest = asyncHandler(async (req, res) => {
     try {
         const { bloodGroup, urgency, message, status, contactDetails, address } = req.body;
@@ -16,6 +57,7 @@ const createBloodRequest = asyncHandler(async (req, res) => {
             throw new ApiError(401, "Unauthorized request");
         }
     
+        // Create and save the blood request
         const bloodRequest = await BloodRequest.create({
             userId: req.user._id,
             bloodGroup,
@@ -23,22 +65,77 @@ const createBloodRequest = asyncHandler(async (req, res) => {
             message: message || "Urgent blood required",
             contactDetails,
             status,
-            address
+            address,
         });
     
         const savedBloodRequest = await bloodRequest.save();
-    
+
+        // Notify users based on location and blood group
+        const io = getIO();
+
+        // Extract location details (city, district, state)
+        const { city, district, state } = address;
+
+        // Step 1: Find users in the same city with the same blood group
+        let users = await User.find({ "info.bloodGroup": bloodGroup, "address.city": city });
+
+
+        // Step 2: If no users are found in the city, search in the district
+        if (users.length === 0) {
+            users = await User.find({ "info.bloodGroup": bloodGroup, "address.district": district });
+        }
+        
+
+        // Step 3: If no users are found in the district, search in the state
+        if (users.length === 0) {
+            users = await User.find({ "info.bloodGroup": bloodGroup, "address.state": state });
+        }
+
+        // Step 4: Create notifications for all matching users
+        const notifications = users.map((user) => ({
+                userId: user._id,
+                type: "blood_request",
+                message: `A blood request for ${bloodGroup} is needed in ${city}.`,
+                redirectUrl: `/blood-requests/${savedBloodRequest._id}`, // Redirect URL
+                data: { bloodRequestId: savedBloodRequest._id },
+            }))
+
+        // Step 5: Save notifications to the database
+        console.log(notifications);
+        
+        try {
+            await Notification.insertMany(notifications);
+            console.log("Notifications inserted successfully");
+        } catch (error) {
+            console.error("Error inserting notifications:", error.message);
+        }
+        
+
+        // Step 4: Generate notifications and emit them via WebSocket
+        users.forEach(async (user) => {
+            notifications.forEach((notification) => {
+                io.to(user._id.toString()).emit("receiveNotification", {
+                    type: notification.type,
+                    message: notification.message || "An urgent blood request is needed in your area",
+                    redirectUrl: notification.redirectUrl || `/blood-requests/${savedBloodRequest._id}`,
+                    data: notification.data || { bloodRequestId: savedBloodRequest._id },
+                });
+            });
+        });
+        
+
         return res.status(201).json(
             new ApiResponse(201, "Blood request created successfully", {
-                bloodRequest: savedBloodRequest
+                bloodRequest: savedBloodRequest,
             })
         );
     } catch (error) {
         return res.status(500).json(
             new ApiResponse(500, error?.message || "Something went wrong while creating blood request")
-        )
+        );
     }
-})
+});
+
 
 // get all blood requests
 const getAllBloodRequests = asyncHandler(async (req, res) => {

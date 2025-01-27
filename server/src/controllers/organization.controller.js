@@ -328,6 +328,15 @@ const getOrganizationProfile = asyncHandler(async (req, res) => {
     return res.status(200).json(new ApiResponse(200, "Organization profile fetched successfully", organization));
 })
 
+// Get organization profile by id
+const getOrganizationProfileById = asyncHandler(async (req, res) => {
+    const organization = await Organization.findById(req.params.id).select("-password -refreshToken -__v -updatedAt");
+    if (!organization) {
+        throw new ApiError(404, "Organization not found");
+    }
+    return res.status(200).json(new ApiResponse(200, "Organization profile fetched successfully", organization));
+})
+
 export {
     // initiateRegistration,
     // completeRegistration,
@@ -337,5 +346,6 @@ export {
     refreshAccessToken,
     changePassword,
     updateOrganization,
-    getOrganizationProfile
+    getOrganizationProfile,
+    getOrganizationProfileById
 };

@@ -8,7 +8,8 @@ import {
     updateUser,
     searchDonors,
     updateDonationStatus,
-    getCurrentUser
+    getCurrentUser,
+    getUserById
 } from "../controllers/user.controller.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 
@@ -16,7 +17,7 @@ const router = Router();
 
 router.post("/register", registerUser);
 router.post("/login", loginUser);
-
+router.get("/:id", getUserById);
 
 // secure routes
 
@@ -29,5 +30,6 @@ router.patch("/update", updateUser);
 router.get("/search", searchDonors);
 router.patch("/donation-status", updateDonationStatus);
 router.get("/current-user", getCurrentUser);
+
 
 export default router;
