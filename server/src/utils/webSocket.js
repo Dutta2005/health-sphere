@@ -15,7 +15,9 @@ export const initializeWebSocket = (server) => {
         cors: {
             origin: ["http://localhost:5173", "https://health-sphere-eight.vercel.app"],
             credentials: true,
+            methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
         },
+        path: "/socket.io/",
         pingTimeout: 60000,
         pingInterval: 25000,
         transports: ['websocket', 'polling']
@@ -75,6 +77,7 @@ export const initializeWebSocket = (server) => {
 
         socket.on("disconnect", (reason) => {
             console.log(`Socket ${socket.id} disconnected. Reason: ${reason}`);
+            
         });
 
         socket.on("error", (error) => {

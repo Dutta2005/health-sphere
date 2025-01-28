@@ -12,12 +12,22 @@ export const initializeSocket = (userId: string): Socket => {
       reconnection: true,
       reconnectionAttempts: 5,
       reconnectionDelay: 1000,
-      auth: { userId }
+      auth: { userId },
+      path: '/socket.io/', // Explicitly set the socket.io path
     });
 
     socket.on("connect", () => {
       socket?.emit("joinRoom", userId);
     });
+
+    socket.on("connect_error", (error) => {
+      console.error("Socket connection error:", error);
+      // Attempt to fall back to polling if websocket fails
+      if (socket?.io?.opts?.transports?.includes('websocket' as any)) {
+        socket.io.opts.transports = ['polling' as any];
+      }
+    });
+
 
     socket.on("disconnect", (reason) => {
       if (reason === "io server disconnect") {
