@@ -23,6 +23,7 @@ import OrgPost from './pages/organisation/OrgPost.tsx'
 import OrgProfile from './pages/organisation/OrgProfile.tsx'
 import OrgPostView from './pages/organisation/OrgPostView.tsx'
 import OrgHome from './pages/organisation/OrgHome.tsx'
+import NotificationPage from './pages/account/NotificationPage.tsx'
 
 const router = createBrowserRouter([
   {
@@ -38,7 +39,7 @@ const router = createBrowserRouter([
       { path: 'posts', element: <OrgPost /> },
       { path: 'org-profile/:id', element: <OrgProfile /> },
       { path: 'post/:id', element: <OrgPostView /> },
-
+      { path: 'notifications', element: <NotificationPage /> },
       { 
         path: 'discussions', 
         element: <Discussions />,
