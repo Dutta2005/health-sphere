@@ -221,7 +221,8 @@ const getBloodRequestsByUserId = asyncHandler(async (req, res) => {
         const totalRequests = await BloodRequest.countDocuments({ userId });
         const bloodRequests = await BloodRequest.find({ userId })
             .skip(skip)
-            .limit(limit);
+            .limit(limit)
+            .sort({ createdAt: -1 });
 
         return res.status(200).json(
             new ApiResponse(200, "Blood requests fetched successfully", {
