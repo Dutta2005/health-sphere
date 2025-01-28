@@ -46,7 +46,7 @@ export default {
             text: '#2c3e50', // Deep Charcoal (professional, readable)
         },
         dark: {
-            bg: '#0f2027', // Deep Navy (calm, trustworthy)
+            bg: '#222222', // Deep Navy (calm, trustworthy)
             text: '#e0e6ed', // Soft Cloud Grey (gentle, approachable)
         },
     }

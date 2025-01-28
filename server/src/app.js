@@ -53,10 +53,11 @@ const server = createServer(app); // Create an HTTP server
 
 console.log(process.env.CORS_ORIGIN);
 app.use(cors({
-    // origin: process.env.CORS_ORIGIN || "http://localhost:5173",
-    origin: 'https://health-sphere-eight.vercel.app',
+    origin: process.env.CORS_ORIGIN,
+    // origin: 'https://health-sphere-eight.vercel.app',
     credentials: true,
 }));
+console.log("app.js", process.env.CORS_ORIGIN);
 
 app.use(express.json({ limit: "20kb" }));
 app.use(express.urlencoded({ extended: true, limit: "20kb" }));
