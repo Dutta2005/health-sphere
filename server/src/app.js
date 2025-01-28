@@ -44,7 +44,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv"; 
 import { createServer } from "http"; // Import HTTP server
-import { initializeWebSocket } from "../api/socket.js"; // Import WebSocket setup
+import { initializeWebSocket } from "./utils/webSocket.js"; // Import WebSocket setup
 
 dotenv.config({ path: "./.env" });
 

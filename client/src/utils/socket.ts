@@ -13,7 +13,7 @@ export const initializeSocket = (userId: string): Socket => {
       reconnectionAttempts: 5,
       reconnectionDelay: 1000,
       auth: { userId },
-      path: '/api/socket', // Explicitly set the socket.io path
+      path: '/socket.io/', // Explicitly set the socket.io path
     });
 
     socket.on("connect", () => {
