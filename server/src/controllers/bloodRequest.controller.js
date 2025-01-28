@@ -114,7 +114,7 @@ const createBloodRequest = asyncHandler(async (req, res) => {
         // Step 4: Generate notifications and emit them via WebSocket
         users.forEach(async (user) => {
             notifications.forEach((notification) => {
-                io.to(user._id.toString()).emit("receiveNotification", {
+                io.to(user._id.toString()).emit("bloodRequest", {
                     type: notification.type,
                     message: notification.message || "An urgent blood request is needed in your area",
                     redirectUrl: notification.redirectUrl || `/blood-requests/${savedBloodRequest._id}`,

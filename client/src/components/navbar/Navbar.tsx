@@ -17,6 +17,7 @@ import { Switch } from "../ui/switch";
 import { RootState } from "../../store/store";
 import { toggleTheme } from "../../store/themeSlice";
 import Logoutbtn from "../Logoutbtn";
+import Notifications from "./Notifications";
 
 const Navbar = () => {
   const dispatch = useDispatch();
@@ -28,6 +29,15 @@ const Navbar = () => {
   const handleThemeToggle = () => {
     dispatch(toggleTheme());
   };
+
+  const menuOptions = [
+    { name: "Home", link: "/", auth: true },
+    { name: "Blood Bridge", link: "/bloodbridge", auth: true },
+    { name: "Discussions", link: "/discussions", auth: true },
+    { name: "Campaigns", link: "/posts", auth: true },
+    { name: "Login", link: "/login", auth: false },
+    { name: "Signup", link: "/signup", auth: false },
+  ]
 
   return (
     <nav
@@ -46,75 +56,11 @@ const Navbar = () => {
           {/* Center - Navigation */}
           <NavigationMenu className="hidden md:block">
             <NavigationMenuList className="flex gap-6">
-              {isAuthenticated && (
-                <NavigationMenuItem>
-                  <NavLink
-                    to="/"
-                    className={({ isActive }) =>
-                      `hover:text-accent transition-colors ${
-                        isActive
-                          ? "text-accent"
-                          : "dark:text-dark-text"
-                      }`
-                    }
-                  >
-                    Home
-                  </NavLink>
-                </NavigationMenuItem>
-              )}
-              {isAuthenticated && (
-                <NavigationMenuItem>
-                  <NavLink
-                    to="/bloodbridge"
-                    className={({ isActive }) =>
-                      `hover:text-accent transition-colors ${
-                        isActive
-                          ? "text-accent"
-                          : "dark:text-dark-text"
-                      }`
-                    }
-                  >
-                    Blood Bridge
-                  </NavLink>
-                </NavigationMenuItem>
-              )}
-              {isAuthenticated && (
-                <NavigationMenuItem>
-                  <NavLink
-                    to="/discussions"
-                    className={({ isActive }) =>
-                      `hover:text-accent transition-colors ${
-                        isActive
-                          ? "text-accent"
-                          : "dark:text-dark-text"
-                      }`
-                    }
-                  >
-                    Discussions
-                  </NavLink>
-                </NavigationMenuItem>
-              )}
-              {isAuthenticated && (
-                <NavigationMenuItem>
-                  <NavLink
-                    to="/posts"
-                    className={({ isActive }) =>
-                      `hover:text-accent transition-colors ${
-                        isActive
-                          ? "text-accent"
-                          : "dark:text-dark-text"
-                      }`
-                    }
-                  >
-                    Campaigns
-                  </NavLink>
-                </NavigationMenuItem>
-              )}
-              {!isAuthenticated && (
-                <>
-                  <NavigationMenuItem>
+              {menuOptions.map((option) => {
+                return (
+                  <NavigationMenuItem key={option.name} className={`${option.auth === isAuthenticated ? "" : "hidden"}`}>
                     <NavLink
-                      to="/login"
+                      to={option.link}
                       className={({ isActive }) =>
                         `hover:text-accent transition-colors ${
                           isActive
@@ -125,32 +71,19 @@ const Navbar = () => {
                         }`
                       }
                     >
-                      Login
+                      {option.name}
                     </NavLink>
                   </NavigationMenuItem>
-                  <NavigationMenuItem>
-                    <NavLink
-                      to="/signup"
-                      className={({ isActive }) =>
-                        `hover:text-accent transition-colors ${
-                          isActive
-                            ? "text-accent"
-                            : theme === "dark"
-                            ? "text-dark-text"
-                            : "text-light-text"
-                        }`
-                      }
-                    >
-                      Signup
-                    </NavLink>
-                  </NavigationMenuItem>
-                </>
-              )}
+                );
+              })}
             </NavigationMenuList>
           </NavigationMenu>
 
           {/* Right side - User Menu */}
           <div className="flex items-center gap-4">
+          {isAuthenticated && (
+            <Notifications />
+          )}
           <DropdownMenu>
   <DropdownMenuTrigger asChild>
     <Avatar 

@@ -1,43 +1,97 @@
+
 import { Server } from "socket.io";
 
-let io; // Declare `io` to be used globally in this file
+let io;
 
-// Initialize WebSocket Server
 export const initializeWebSocket = (server) => {
+    if (io) {
+        console.log('WebSocket server already initialized');
+        return io;
+    }
+
+    console.log('Starting WebSocket server initialization...');
+    
     io = new Server(server, {
         cors: {
-            // origin: process.env.CORS_ORIGIN || "http://localhost:5173",
-            origin: "https://health-sphere-eight.vercel.app",
+            origin: ["http://localhost:5173", "https://health-sphere-eight.vercel.app"],
             credentials: true,
         },
+        pingTimeout: 60000,
+        pingInterval: 25000,
+        transports: ['websocket', 'polling']
+    });
+
+    // Log when the server is ready
+    io.engine.on("connection_error", (err) => {
+        console.log("Connection error:", err);
+    });
+
+    io.engine.on("initial_headers", () => {
+        console.log("WebSocket server initialized and ready for connections");
     });
 
     io.on("connection", (socket) => {
-        console.log(`User connected: ${socket.id}`);
+        console.log(`New socket connection - ID: ${socket.id}`);
+        console.log('Client handshake:', socket.handshake.query);
+        
+        // Log current number of connections
+        const connectedSockets = io.sockets.sockets.size;
+        console.log(`Total connected clients: ${connectedSockets}`);
 
-        // Handle joining rooms
         socket.on("joinRoom", (room) => {
-            socket.join(room);
-            console.log(`User ${socket.id} joined room: ${room}`);
+            try {
+                console.log(`Join room request - Socket: ${socket.id}, Room: ${room}`);
+                socket.join(room);
+                
+                // Verify room joining
+                const socketRooms = Array.from(socket.rooms);
+                console.log(`Socket ${socket.id} is now in rooms:`, socketRooms);
+                
+                // Send confirmation back to client
+                socket.emit("roomJoined", { 
+                    success: true, 
+                    room,
+                    socketId: socket.id 
+                });
+            } catch (error) {
+                console.error(`Error joining room: ${error.message}`);
+                socket.emit("roomJoined", { 
+                    success: false, 
+                    error: error.message 
+                });
+            }
         });
 
-        // Handle sending notifications
         socket.on("sendNotification", (data) => {
-            const { room, notification } = data;
-            io.to(room).emit("receiveNotification", notification);
-            console.log(`Notification sent to room ${room}:`, notification);
+            try {
+                console.log(`Notification request from ${socket.id}:`, data);
+                const { room, notification } = data;
+                io.to(room).emit("receiveNotification", notification);
+                console.log(`Notification sent to room ${room}`);
+            } catch (error) {
+                console.error(`Error sending notification: ${error.message}`);
+            }
         });
 
-        // Handle user disconnection
-        socket.on("disconnect", () => {
-            console.log(`User disconnected: ${socket.id}`);
+        socket.on("disconnect", (reason) => {
+            console.log(`Socket ${socket.id} disconnected. Reason: ${reason}`);
+        });
+
+        socket.on("error", (error) => {
+            console.error(`Socket ${socket.id} error:`, error);
         });
     });
+
+    // Periodic logging of server status
+    setInterval(() => {
+        const rooms = io.sockets.adapter.rooms;
+        console.log('Current rooms:', Array.from(rooms.keys()));
+        console.log('Connected clients:', io.sockets.sockets.size);
+    }, 30000);
 
     return io;
 };
 
-// Export `io` instance to use elsewhere if needed
 export const getIO = () => {
     if (!io) {
         throw new Error("WebSocket server is not initialized!");
