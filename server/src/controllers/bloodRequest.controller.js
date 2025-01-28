@@ -138,11 +138,39 @@ const createBloodRequest = asyncHandler(async (req, res) => {
 
 
 // get all blood requests
+// const getAllBloodRequests = asyncHandler(async (req, res) => {
+//     try {
+//         const bloodRequests = await BloodRequest.find().sort({ createdAt: -1 });
+//         return res.status(200).json(
+//             new ApiResponse(200, "Blood requests fetched successfully", bloodRequests)
+//         );
+//     } catch (error) {
+//         return res.status(500).json(
+//             new ApiResponse(500, error?.message || "Something went wrong while fetching blood requests")
+//         )
+//     }
+// })
 const getAllBloodRequests = asyncHandler(async (req, res) => {
     try {
-        const bloodRequests = await BloodRequest.find().sort({ createdAt: -1 });
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const skip = (page - 1) * limit;
+
+        const totalRequests = await BloodRequest.countDocuments();
+        const bloodRequests = await BloodRequest.find()
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(limit);
+
         return res.status(200).json(
-            new ApiResponse(200, "Blood requests fetched successfully", bloodRequests)
+            new ApiResponse(200, "Blood requests fetched successfully", {
+                bloodRequests,
+                currentPage: page,
+                totalPages: Math.ceil(totalRequests / limit),
+                totalRequests,
+                hasNext: page * limit < totalRequests,
+                hasPrev: page > 1
+            })
         );
     } catch (error) {
         return res.status(500).json(
@@ -170,12 +198,40 @@ const getBloodRequestById = asyncHandler(async (req, res) => {
 })
 
 // get blood requests by user id
+// const getBloodRequestsByUserId = asyncHandler(async (req, res) => {
+//     try {
+//         const userId = req.user._id;
+//         const bloodRequests = await BloodRequest.find({ userId });
+//         return res.status(200).json(
+//             new ApiResponse(200, "Blood requests fetched successfully", bloodRequests)
+//         );
+//     } catch (error) {
+//         return res.status(500).json(
+//             new ApiResponse(500, error?.message || "Something went wrong while fetching blood requests")
+//         )
+//     }    
+// })
 const getBloodRequestsByUserId = asyncHandler(async (req, res) => {
     try {
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const skip = (page - 1) * limit;
         const userId = req.user._id;
-        const bloodRequests = await BloodRequest.find({ userId });
+
+        const totalRequests = await BloodRequest.countDocuments({ userId });
+        const bloodRequests = await BloodRequest.find({ userId })
+            .skip(skip)
+            .limit(limit);
+
         return res.status(200).json(
-            new ApiResponse(200, "Blood requests fetched successfully", bloodRequests)
+            new ApiResponse(200, "Blood requests fetched successfully", {
+                bloodRequests,
+                currentPage: page,
+                totalPages: Math.ceil(totalRequests / limit),
+                totalRequests,
+                hasNext: page * limit < totalRequests,
+                hasPrev: page > 1
+            })
         );
     } catch (error) {
         return res.status(500).json(
@@ -185,9 +241,45 @@ const getBloodRequestsByUserId = asyncHandler(async (req, res) => {
 })
 
 // get blood requests by blood group
+// const getBloodRequestsByBloodGroup = asyncHandler(async (req, res) => {
+//     try {
+//         const { bloodGroup } = req.query;
+
+//         // Validate bloodGroup parameter
+//         if (!bloodGroup) {
+//             return res.status(400).json(
+//                 new ApiResponse(400, "Blood group is required")
+//             );
+//         }
+
+//         const bloodRequests = await BloodRequest.find({ bloodGroup: bloodGroup });
+//         return res.status(200).json(
+//             new ApiResponse(200, "Blood requests fetched successfully", bloodRequests)
+//         );
+//     } catch (error) {
+//         return res.status(500).json(
+//             new ApiResponse(500, error?.message || "Something went wrong while fetching blood requests")
+//         );
+//     }
+// });
 const getBloodRequestsByBloodGroup = asyncHandler(async (req, res) => {
     try {
-        const { bloodGroup } = req.query;
+        let { bloodGroup } = req.query;
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const skip = (page - 1) * limit;
+
+        // Decode the blood group from the URL
+        bloodGroup = decodeURIComponent(bloodGroup);
+
+        // Handle the case where '+' might be encoded as space
+        if (bloodGroup.includes(' ')) {
+            bloodGroup = bloodGroup.replace(' ', '+');
+        }
+
+        // Log the received and processed blood group
+        // console.log('Received blood group:', req.query.bloodGroup);
+        // console.log('Processed blood group:', bloodGroup);
 
         // Validate bloodGroup parameter
         if (!bloodGroup) {
@@ -196,11 +288,31 @@ const getBloodRequestsByBloodGroup = asyncHandler(async (req, res) => {
             );
         }
 
-        const bloodRequests = await BloodRequest.find({ bloodGroup: bloodGroup });
+        // Validate blood group against allowed values
+        const validBloodGroups = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
+        if (!validBloodGroups.includes(bloodGroup)) {
+            return res.status(400).json(
+                new ApiResponse(400, `Invalid blood group. Must be one of: ${validBloodGroups.join(', ')}. Received: ${bloodGroup}`)
+            );
+        }
+
+        const totalRequests = await BloodRequest.countDocuments({ bloodGroup });
+        const bloodRequests = await BloodRequest.find({ bloodGroup })
+            .skip(skip)
+            .limit(limit);
+
         return res.status(200).json(
-            new ApiResponse(200, "Blood requests fetched successfully", bloodRequests)
+            new ApiResponse(200, "Blood requests fetched successfully", {
+                bloodRequests,
+                currentPage: page,
+                totalPages: Math.ceil(totalRequests / limit),
+                totalRequests,
+                hasNext: page * limit < totalRequests,
+                hasPrev: page > 1
+            })
         );
     } catch (error) {
+        console.error('Error in getBloodRequestsByBloodGroup:', error);
         return res.status(500).json(
             new ApiResponse(500, error?.message || "Something went wrong while fetching blood requests")
         );
@@ -269,19 +381,53 @@ const deleteBloodRequest = asyncHandler(async (req, res) => {
 })
 
 // Fetch Blood Requests with Status Filtering
+// const getBloodRequestsByStatus = asyncHandler(async (req, res) => {
+//     try {
+//         const { status } = req.query;
+    
+//         if (status && !['pending', 'accepted', 'rejected'].includes(status)) {
+//             throw new ApiError(400, "Invalid status");
+//         }
+    
+//         const bloodRequests = await BloodRequest.find(status ? { status } : {})
+//           .populate('userId', 'name email');
+    
+//         res.status(200).json(
+//             new ApiResponse(200, "Blood requests fetched successfully", bloodRequests)
+//         );
+//     } catch (error) {
+//         res.status(500).json(
+//             new ApiResponse(500, error?.message || "Something went wrong while fetching blood requests")
+//         );
+//     }
+// })
 const getBloodRequestsByStatus = asyncHandler(async (req, res) => {
     try {
         const { status } = req.query;
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const skip = (page - 1) * limit;
     
         if (status && !['pending', 'accepted', 'rejected'].includes(status)) {
             throw new ApiError(400, "Invalid status");
         }
     
-        const bloodRequests = await BloodRequest.find(status ? { status } : {})
-          .populate('userId', 'name email');
+        const query = status ? { status } : {};
+        const totalRequests = await BloodRequest.countDocuments(query);
+        const bloodRequests = await BloodRequest.find(query)
+            .populate('userId', 'name email')
+            .skip(skip)
+            .limit(limit);
     
         res.status(200).json(
-            new ApiResponse(200, "Blood requests fetched successfully", bloodRequests)
+            new ApiResponse(200, "Blood requests fetched successfully", {
+                bloodRequests,
+                currentPage: page,
+                totalPages: Math.ceil(totalRequests / limit),
+                totalRequests,
+                hasNext: page * limit < totalRequests,
+                hasPrev: page > 1
+            })
         );
     } catch (error) {
         res.status(500).json(
