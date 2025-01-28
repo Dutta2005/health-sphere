@@ -1,6 +1,12 @@
 {
     "rewrites": [
         {"source": "/(.*)", "destination": "/"},
-        {"source": "/organisation/(.*)", "destination": "/organisation"}
-    ]
+        {"source": "/organisation/(.*)", "destination": "/organisation"},
+        {"source": "/api/socket/:path*", "destination": "/api/socket"}
+    ],
+    "function": {
+        "api/socket.js": {
+            "runtime": "edge"
+        }
+    }
 }

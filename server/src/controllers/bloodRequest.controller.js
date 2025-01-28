@@ -4,7 +4,7 @@ import { ApiResponse } from "../utils/apiResponse.js";
 import { asyncHandler } from "../utils/asynchandler.js";
 import { User } from "../models/user.model.js"; // Assuming you have a User model
 import { Notification } from "../models/notification.model.js"; // Notification model
-import { getIO } from "../utils/webSocket.js"; // Import WebSocket instance
+import { getIO } from "../../api/socket.js"; // Import WebSocket instance
 
 
 
