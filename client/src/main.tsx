@@ -24,6 +24,7 @@ import OrgProfile from './pages/organisation/OrgProfile.tsx'
 import OrgPostView from './pages/organisation/OrgPostView.tsx'
 import OrgHome from './pages/organisation/OrgHome.tsx'
 import NotificationPage from './pages/account/NotificationPage.tsx'
+import MedicalChatbot from './pages/Chatbot.tsx'
 
 const router = createBrowserRouter([
   {
@@ -35,6 +36,10 @@ const router = createBrowserRouter([
       {
         path: 'bloodbridge',
         element: <BloodBridge />
+      },
+      {
+        path: 'chatbot',
+        element: <MedicalChatbot />
       },
       { path: 'posts', element: <OrgPost /> },
       { path: 'org-profile/:id', element: <OrgProfile /> },
