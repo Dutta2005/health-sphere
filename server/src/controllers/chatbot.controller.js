@@ -12,8 +12,7 @@ const commonConditions = [
   { id: 2, name: 'Common Cold', prompt: 'I have runny nose and fever' },
   { id: 3, name: 'Stomach Pain', prompt: 'I have stomach pain and nausea' },
   { id: 4, name: 'Allergies', prompt: 'I have itchy eyes and sneezing' },
-  { id: 5, name: 'Back Pain', prompt: 'I have lower back pain' },
-  { id: 6, name: 'Private Health', prompt: 'I have a private health concern' },
+  { id: 5, name: 'Back Pain', prompt: 'I have lower back pain' }
 ];
 
 // Helper function to convert chat history
