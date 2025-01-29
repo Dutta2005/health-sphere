@@ -85,7 +85,7 @@ function LandingPage() {
             <p className="text-lg text-light-text/70 dark:text-dark-text/70">Are you an organization?</p>
             <Link
               to="/register"
-              className="inline-flex items-center gap-2  text-white rounded-full px-8 py-3 text-lg font-medium transition-all duration-300 transform hover:scale-105"
+              className="inline-flex items-center gap-2 text-gray-900 dark:text-white rounded-full px-8 py-3 text-lg font-medium transition-all duration-300 transform hover:scale-105"
             >
               Be a Part of This Movement
               <ArrowRight className="w-5 h-5" />
