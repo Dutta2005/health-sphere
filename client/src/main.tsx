@@ -25,6 +25,8 @@ import OrgPostView from './pages/organisation/OrgPostView.tsx'
 import OrgHome from './pages/organisation/OrgHome.tsx'
 import NotificationPage from './pages/account/NotificationPage.tsx'
 import MedicalChatbot from './pages/Chatbot.tsx'
+import Protected from './components/layouts/Protected.tsx'
+import PublicRoutes from './components/layouts/PublicRoutes.tsx'
 
 const router = createBrowserRouter([
   {
@@ -35,19 +37,19 @@ const router = createBrowserRouter([
       { path: '*', element: <Error404 /> },
       {
         path: 'bloodbridge',
-        element: <BloodBridge />
+        element: <Protected role="user"><BloodBridge /></Protected>
       },
       {
         path: 'chatbot',
-        element: <MedicalChatbot />
+        element: <Protected role="user"><MedicalChatbot /></Protected>
       },
-      { path: 'posts', element: <OrgPost /> },
+      { path: 'posts', element: <Protected role="user"><OrgPost /></Protected> },
       { path: 'org-profile/:id', element: <OrgProfile /> },
       { path: 'post/:id', element: <OrgPostView /> },
-      { path: 'notifications', element: <NotificationPage /> },
+      { path: 'notifications', element: <Protected role="user"><NotificationPage /></Protected> },
       { 
         path: 'discussions', 
-        element: <Discussions />,
+        element: <Protected role="user"><Discussions /></Protected>,
         children: [
         ]
       },
@@ -60,20 +62,20 @@ const router = createBrowserRouter([
     children: [
       { path: '', element: <OrgHome /> },
       { path: '*' , element: <Error404 /> },
-      { path: 'posts', element: <OrgPost /> },
+      { path: 'posts', element: <Protected role="organization"><OrgPost /></Protected> },
       { path: 'org-profile/:id', element: <OrgProfile /> },
       { path: 'post/:id', element: <OrgPostView /> }
     ]
   },
-  { path: 'register', element: <OrganizationSignup /> },
-  { path: 'signin', element: <OrganizationLogin /> },
+  { path: 'register', element: <PublicRoutes role="organization"><OrganizationSignup /></PublicRoutes> },
+  { path: 'signin', element: <PublicRoutes role="organization"><OrganizationLogin /></PublicRoutes> },
   { 
     path: 'login',
-    element: <Login />
+    element: <PublicRoutes role="user"><Login /></PublicRoutes>
   },
   {
     path: 'signup',
-    element: <Signup />
+    element: <PublicRoutes role="user"><Signup /></PublicRoutes>
   }, 
 ])
 
