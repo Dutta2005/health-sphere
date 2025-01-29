@@ -3,6 +3,7 @@ import { createSlice } from "@reduxjs/toolkit";
 interface User {
   id: string;
   name: string;
+  bloodGroup: string;
 }
 
 interface Organization {
@@ -32,6 +33,7 @@ const authSlice = createSlice({
       state.user = {
         id: action.payload._id,
         name: action.payload.name,
+        bloodGroup: action.payload.info.bloodGroup,
       };
       state.organization = null;
       state.role = "user";

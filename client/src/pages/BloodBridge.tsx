@@ -6,7 +6,7 @@ import {
   TabsTrigger,
 } from "../components/ui/tabs";
 import UserRequests from "../components/blood bridge/UserRequests";
-import { Heart, Users, Droplet, Clock } from "lucide-react";
+import Requests from "../components/blood bridge/Requests";
 
 function BloodBridge() {
   return (
@@ -15,33 +15,10 @@ function BloodBridge() {
         <div className="container mx-auto px-4 text-center">
           <h1 className="text-5xl font-bold mb-4">BloodBridge</h1>
           <p className="text-xl font-light max-w-2xl mx-auto">
-            Every drop counts. Join our community of life-savers and make a
-            difference today.
+          Your decision to donate blood can save up to three lives.
           </p>
         </div>
       </header>
-
-      <div className="container mx-auto px-4 -mt-8">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-12">
-          {[
-            { icon: Heart, label: "Lives Saved", value: "1,000+" },
-            { icon: Users, label: "Active Donors", value: "500+" },
-            { icon: Droplet, label: "Donations Made", value: "2,500+" },
-            { icon: Clock, label: "Response Time", value: "30 mins" },
-          ].map(({ icon: Icon, label, value }) => (
-            <div
-              key={label}
-              className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg text-center"
-            >
-              <Icon className="w-8 h-8 mx-auto mb-4 text-red-600" />
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                {value}
-              </p>
-              <p className="text-gray-600 dark:text-gray-300">{label}</p>
-            </div>
-          ))}
-        </div>
-      </div>
 
       <main className="container mx-auto px-4 py-8">
         <Tabs defaultValue="donor" className="w-full max-w-4xl mx-auto">
@@ -64,48 +41,10 @@ function BloodBridge() {
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
             <TabsContent value="donor" className="space-y-6">
               <RequestForm />
-              <div className="text-center mb-8">
-                <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+                <h2 className="text-center mb-8 text-3xl font-bold text-gray-900 dark:text-white">
                   Become a Life Saver
                 </h2>
-                <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-                  Your decision to donate blood can save up to three lives. Join
-                  our network of donors and be notified when your blood type is
-                  needed in your area.
-                </p>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                {[
-                  {
-                    title: "Quick Response",
-                    description:
-                      "Get notified instantly when your blood type is needed nearby",
-                  },
-                  {
-                    title: "Safe & Secure",
-                    description:
-                      "Your information is protected and only shared with verified hospitals",
-                  },
-                  {
-                    title: "Save Lives",
-                    description:
-                      "Make a real difference in your community by helping those in need",
-                  },
-                ].map((feature) => (
-                  <div
-                    key={feature.title}
-                    className="p-6 bg-gray-50 dark:bg-gray-700 rounded-lg"
-                  >
-                    <h3 className="text-xl font-semibold mb-2 text-gray-900 dark:text-white">
-                      {feature.title}
-                    </h3>
-                    <p className="text-gray-600 dark:text-gray-300">
-                      {feature.description}
-                    </p>
-                  </div>
-                ))}
-              </div>
+                <Requests />
             </TabsContent>
 
             <TabsContent value="requests">
