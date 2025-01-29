@@ -1,9 +1,14 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Send, Plus } from 'lucide-react';
+// MedicalChatbot.tsx
+import React, { useState, useRef, useEffect, lazy, Suspense } from 'react';
+import { Send } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { api } from '../api/api';
+
+// Lazy loaded components
+const MessageList = lazy(() => import('../components/MessageComponent'));
+const QuickAddSection = lazy(() => import('../components/QuickAddSection'));
 
 interface Message {
     role: 'user' | 'assistant';
@@ -37,8 +42,8 @@ const MedicalChatbot: React.FC = () => {
 
   const fetchCommonConditions = async () => {
     try {
-        const { data } = await api.get('/chat/conditions');
-        setConditions(data);
+      const { data } = await api.get('/chat/conditions');
+      setConditions(data);
     } catch (error) {
       console.error('Error fetching conditions:', error);
     }
@@ -53,14 +58,14 @@ const MedicalChatbot: React.FC = () => {
     setIsLoading(true);
 
     try {
-        const { data } = await api.post('/chat/chat', {
-          message: messageText,
-          context: messages
-        });
-    
-        if (data.message) {
-          setMessages(prev => [...prev, { role: 'assistant', content: data.message }]);
-        }
+      const { data } = await api.post('/chat/chat', {
+        message: messageText,
+        context: messages
+      });
+      
+      if (data.message) {
+        setMessages(prev => [...prev, { role: 'assistant', content: data.message }]);
+      }
     } catch (error) {
       console.error('Error sending message:', error);
     } finally {
@@ -68,68 +73,27 @@ const MedicalChatbot: React.FC = () => {
     }
   };
 
-  const handleQuickAdd = (prompt: string) => {
-    sendMessage(prompt);
-  };
-
   return (
     <div className="flex flex-col h-screen max-w-2xl mx-auto p-4">
-      <Card className="flex-grow flex flex-col h-full">
-        <CardHeader>
+      <Card className="flex-grow flex flex-col h-full overflow-hidden">
+        <CardHeader className="shrink-0">
           <CardTitle>Medical Assistant</CardTitle>
         </CardHeader>
         
-        <CardContent className="flex-grow flex flex-col gap-4">
-          {/* Quick Add Section */}
-          <div className="flex flex-wrap gap-2 mb-4">
-            {conditions.map((condition) => (
-              <Button
-                key={condition.id}
-                variant="outline"
-                size="sm"
-                onClick={() => handleQuickAdd(condition.prompt)}
-                className="flex items-center gap-1"
-              >
-                <Plus className="w-4 h-4" />
-                {condition.name}
-              </Button>
-            ))}
-          </div>
+        <CardContent className="flex-grow flex flex-col gap-4 overflow-hidden">
+          <Suspense fallback={<div className="text-center p-2">Loading conditions...</div>}>
+            <QuickAddSection conditions={conditions} onQuickAdd={sendMessage} />
+          </Suspense>
 
-          {/* Chat Messages */}
-          <div className="flex-grow overflow-y-auto">
-            <div className="space-y-4">
-              {messages.map((msg, index) => (
-                <div
-                  key={index}
-                  className={`flex ${
-                    msg.role === 'user' ? 'justify-end' : 'justify-start'
-                  }`}
-                >
-                  <div
-                    className={`max-w-[80%] rounded-lg p-3 ${
-                      msg.role === 'user'
-                        ? 'bg-primary text-primary-foreground ml-4'
-                        : 'bg-muted mr-4'
-                    }`}
-                  >
-                    {msg.content}
-                  </div>
-                </div>
-              ))}
-              {isLoading && (
-                <div className="flex justify-start">
-                  <div className="bg-muted rounded-lg p-3 mr-4">
-                    Thinking...
-                  </div>
-                </div>
-              )}
-              <div ref={messagesEndRef} />
-            </div>
-          </div>
+          <Suspense fallback={<div className="text-center p-2">Loading messages...</div>}>
+            <MessageList 
+              messages={messages}
+              isLoading={isLoading}
+              messagesEndRef={messagesEndRef}
+            />
+          </Suspense>
 
-          {/* Input Section */}
-          <div className="flex gap-2 mt-4">
+          <div className="flex gap-2 mt-auto pt-4 shrink-0">
             <Input
               value={input}
               onChange={(e) => setInput(e.target.value)}
