@@ -18,6 +18,8 @@ import { RootState } from "../../store/store";
 import { toggleTheme } from "../../store/themeSlice";
 import Logoutbtn from "../Logoutbtn";
 import Notifications from "./Notifications";
+import { menuOptions } from "../../utils/userMenu";
+import Sidebar from "./Sidebar";
 
 const Navbar = () => {
   const dispatch = useDispatch();
@@ -30,22 +32,12 @@ const Navbar = () => {
     dispatch(toggleTheme());
   };
 
-  const menuOptions = [
-    { name: "Home", link: "/", auth: true },
-    { name: "Blood Bridge", link: "/bloodbridge", auth: true },
-    { name: "Discussions", link: "/discussions", auth: true },
-    { name: "Campaigns", link: "/posts", auth: true },
-    { name: "Chatbot", link: "/chatbot", auth: true },
-    { name: "Login", link: "/login", auth: false },
-    { name: "Signup", link: "/signup", auth: false },
-  ]
-
   return (
     <nav
       className={'fixed w-full top-0 z-50 backdrop-blur-sm '}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-12">
           {/* Left side - Brand/Logo */}
           <NavLink
             to="/"
@@ -55,7 +47,7 @@ const Navbar = () => {
           </NavLink>
 
           {/* Center - Navigation */}
-          <NavigationMenu className="hidden md:block">
+          <NavigationMenu className="hidden lg:block">
             <NavigationMenuList className="flex gap-6">
               {menuOptions.map((option) => {
                 return (
@@ -85,8 +77,9 @@ const Navbar = () => {
           {isAuthenticated && (
             <Notifications />
           )}
+          <Sidebar />
           <DropdownMenu>
-  <DropdownMenuTrigger asChild>
+  <DropdownMenuTrigger className="hidden lg:block" asChild>
     <Avatar 
       className={`
         cursor-pointer 
