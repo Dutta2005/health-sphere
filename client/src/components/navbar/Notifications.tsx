@@ -1,14 +1,36 @@
-import { useSelector } from "react-redux"
-import { RootState } from "../../store/store"
-import { DropdownMenu, DropdownMenuContent } from "../ui/dropdown-menu"
-import { DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu"
-import { ScrollArea } from "../ui/scroll-area"
-import { Separator } from "../ui/separator"
-import { Bell, Droplet } from "lucide-react"
-import { Link } from "react-router"
+import { useSelector, useDispatch } from 'react-redux';
+import { formatDistanceToNow } from 'date-fns';
+import { addNotifications } from '../../store/notificationSlice';
+import { RootState } from '../../store/store';
+import { Bell, Droplet } from 'lucide-react';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '../ui/dropdown-menu';
+import { Separator } from '../ui/separator';
+import { ScrollArea } from '../ui/scroll-area';
+import { Link } from 'react-router';
+import { api } from '../../api/api';
+import { useEffect } from 'react';
 
 function Notifications() {
-    const notifications = useSelector((state: RootState) => state.notification.notifications)
+    const dispatch = useDispatch();
+    const { notifications, lastCheckedAt } = useSelector((state: RootState) => state.notification);
+    
+    // Fetch notifications when the app opens
+    const fetchNotifications = async () => {
+        try {
+            const response = await api.get('/notifications/after', {
+                params: { time: lastCheckedAt }
+            });
+            if (response.data.data) {                
+                dispatch(addNotifications(response.data.data));
+            }
+        } catch (error) {
+            console.error("Error fetching notifications:", error);
+        }
+    };
+
+    useEffect(() => {
+        fetchNotifications();
+    }, []); // Runs once when the component mounts
     
     return (
         <DropdownMenu>
@@ -27,29 +49,20 @@ function Notifications() {
                     <ScrollArea className="flex-1">
                         <div className="p-4">
                             {notifications.length === 0 ? (
-                                <p className="text-center text-muted-foreground">
-                                    No new notifications
-                                </p>
+                                <p className="text-center text-muted-foreground">No new notifications</p>
                             ) : (
-                                notifications.map((notification, index) => (
-                                    <div 
-                                        key={index} 
-                                        className="flex items-start gap-4 mb-4 last:mb-0"
-                                    >
+                                notifications.map((notification) => (
+                                    <div key={notification._id} className="flex items-start gap-4 mb-4 last:mb-0">
                                         <div className="w-8 h-8 bg-accent/10 rounded-full flex items-center justify-center shrink-0">
-                                            {notification.type === "bloodRequest" ? (
+                                            {notification.type === "blood_request" ? (
                                                 <Droplet className="text-primary" size={16} />
                                             ) : (
                                                 <Bell className="text-primary" size={16} />
                                             )}
                                         </div>
                                         <div className="space-y-1">
-                                            <p className="text-sm leading-none">
-                                                {notification.message}
-                                            </p>
-                                            <p className="text-xs text-muted-foreground">
-                                                2 mins ago
-                                            </p>
+                                            <p className="text-sm leading-none">{notification.message}</p>
+                                            <p className="text-xs text-muted-foreground">{notification?.createdAt && formatDistanceToNow(new Date(notification.createdAt), { addSuffix: true })}</p>
                                         </div>
                                     </div>
                                 ))
@@ -57,16 +70,13 @@ function Notifications() {
                         </div>
                     </ScrollArea>
                     <Separator />
-                    <Link 
-                        to="/notifications" 
-                        className="block p-4 text-center text-sm text-primary hover:bg-accent/10 transition-colors"
-                    >
+                    <Link to="/notifications" className="block p-4 text-center text-sm text-primary hover:bg-accent/10 transition-colors">
                         View all notifications
                     </Link>
                 </div>
             </DropdownMenuContent>
         </DropdownMenu>
-    )
+    );
 }
 
-export default Notifications
+export default Notifications;

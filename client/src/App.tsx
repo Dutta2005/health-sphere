@@ -29,6 +29,8 @@ function App() {
     const socket = initializeSocket(userId);
 
     socket.on("bloodRequest", (notification) => {
+      console.log(notification);
+      
       dispatch(addNotification(notification));
     });
 

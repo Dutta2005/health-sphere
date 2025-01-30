@@ -100,10 +100,41 @@ const deleteAllNotifications = asyncHandler(async (req, res) => {
     }
 });
 
+// Get notifications after a specific timestamp
+const getNotificationsAfterTime = asyncHandler(async (req, res) => {
+    try {
+        const userId = req.user._id;
+        const { time } = req.query;
+
+        if (!time) {
+            throw new ApiError(400, "Timestamp is required");
+        }
+
+        const timestamp = new Date(time);
+        if (isNaN(timestamp.getTime())) {
+            throw new ApiError(400, "Invalid timestamp format");
+        }
+
+        const notifications = await Notification.find({
+            userId,
+            createdAt: { $gt: timestamp }
+        }).sort({ createdAt: -1 });
+
+        return res.status(200).json(
+            new ApiResponse(200, "Filtered notifications fetched successfully", notifications)
+        );
+    } catch (error) {
+        return res.status(500).json(
+            new ApiResponse(500, error?.message || "Something went wrong while fetching notifications")
+        );
+    }
+});
+
 export {
     markNotificationAsRead,
     markAllNotificationsAsRead,
     getAllNotifications,
     deleteNotification,
-    deleteAllNotifications
+    deleteAllNotifications,
+    getNotificationsAfterTime
 };

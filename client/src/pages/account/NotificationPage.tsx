@@ -15,6 +15,8 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "../../components/ui/alert-dialog";
+import { useDispatch } from "react-redux";
+import { clearNotifications, updateLastCheckedAt } from "../../store/notificationSlice";
 
 interface Notification {
   userId: string;
@@ -95,6 +97,7 @@ const NotificationItem = ({
 };
 
 function NotificationPage() {
+  const dispatch = useDispatch()
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -146,6 +149,8 @@ function NotificationPage() {
   };
 
   useEffect(() => {
+    dispatch(updateLastCheckedAt());
+    dispatch(clearNotifications())
     getNotifications();
   }, []);
 

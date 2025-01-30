@@ -202,6 +202,7 @@ const createBloodRequest = asyncHandler(async (req, res) => {
                     message: notification.message,
                     redirectUrl: notification.redirectUrl,
                     data: notification.data,
+                    createdAt: notification.createdAt
                 });
 
                 return notification;
