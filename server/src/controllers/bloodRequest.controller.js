@@ -45,20 +45,111 @@ import { getIO } from "../utils/webSocket.js"; // Import WebSocket instance
 //     }
 // })
 
+
+// const createBloodRequest = asyncHandler(async (req, res) => {
+//     try {
+//         const { bloodGroup, urgency, message, status, contactDetails, address } = req.body;
+   
+//         if (!bloodGroup || !urgency || !status || !contactDetails || !address) {
+//             throw new ApiError(400, "All fields are required");
+//         }
+   
+//         if (!req.user) {
+//             throw new ApiError(401, "Unauthorized request");
+//         }
+   
+//         // Create and save the blood request
+//         const bloodRequest = await BloodRequest.create({
+//             userId: req.user._id,
+//             bloodGroup,
+//             urgency,
+//             message: message || "Urgent blood required",
+//             contactDetails,
+//             status,
+//             address,
+//         });
+   
+//         const savedBloodRequest = await bloodRequest.save();
+        
+//         // Get Socket.io instance
+//         const io = getIO();
+        
+//         // Extract location details
+//         const { city, district, state } = address;
+        
+//         // Find matching users with hierarchical location search
+//         let users = await User.find({ "info.bloodGroup": bloodGroup, "address.city": city });
+        
+//         if (users.length === 0) {
+//             users = await User.find({ "info.bloodGroup": bloodGroup, "address.district": district });
+//         }
+        
+//         if (users.length === 0) {
+//             users = await User.find({ "info.bloodGroup": bloodGroup, "address.state": state });
+//         }
+
+//         // Create notifications for each user
+//         const notifications = await Promise.all(users.map(async (user) => {
+//             // Create notification document
+//             const notification = new Notification({
+//                 userId: user._id,
+//                 type: "blood_request",
+//                 message: `A blood request for ${bloodGroup} is needed in ${city}.`,
+//                 redirectUrl: `/blood-requests/${savedBloodRequest._id}`,
+//                 data: { bloodRequestId: savedBloodRequest._id },
+//             });
+
+//             // Save notification to database
+//             try {
+//                 const savedNotification = await notification.save();
+                
+//                 // Emit websocket event to the specific user
+//                 io.to(user._id.toString()).emit("bloodRequest", {
+//                     type: savedNotification.type,
+//                     message: savedNotification.message,
+//                     redirectUrl: savedNotification.redirectUrl,
+//                     data: savedNotification.data,
+//                 });
+
+//                 return savedNotification;
+//             } catch (error) {
+//                 console.error(`Error creating notification for user ${user._id}:`, error.message);
+//                 return null;
+//             }
+//         }));
+
+//         // Filter out failed notifications
+//         const successfulNotifications = notifications.filter(notification => notification !== null);
+        
+//         return res.status(201).json(
+//             new ApiResponse(201, "Blood request created successfully", {
+//                 bloodRequest: savedBloodRequest,
+//                 notificationsSent: successfulNotifications.length
+//             })
+//         );
+//     } catch (error) {
+//         return res.status(500).json(
+//             new ApiResponse(500, error?.message || "Something went wrong while creating blood request")
+//         );
+//     }
+// });
+
+
+
 const createBloodRequest = asyncHandler(async (req, res) => {
     try {
         const { bloodGroup, urgency, message, status, contactDetails, address } = req.body;
-    
+   
         if (!bloodGroup || !urgency || !status || !contactDetails || !address) {
             throw new ApiError(400, "All fields are required");
         }
-    
+   
         if (!req.user) {
             throw new ApiError(401, "Unauthorized request");
         }
-    
-        // Create and save the blood request
-        const bloodRequest = await BloodRequest.create({
+   
+        // Create blood request - removed the separate save since create() already saves
+        const savedBloodRequest = await BloodRequest.create({
             userId: req.user._id,
             bloodGroup,
             urgency,
@@ -67,69 +158,73 @@ const createBloodRequest = asyncHandler(async (req, res) => {
             status,
             address,
         });
-    
-        const savedBloodRequest = await bloodRequest.save();
-
-        // Notify users based on location and blood group
+        
+        // Get Socket.io instance
         const io = getIO();
-
-        // Extract location details (city, district, state)
+        
+        // Extract location details
         const { city, district, state } = address;
-
-        // Step 1: Find users in the same city with the same blood group
-        let users = await User.find({ "info.bloodGroup": bloodGroup, "address.city": city });
-
-
-        // Step 2: If no users are found in the city, search in the district
-        if (users.length === 0) {
-            users = await User.find({ "info.bloodGroup": bloodGroup, "address.district": district });
-        }
         
-
-        // Step 3: If no users are found in the district, search in the state
-        if (users.length === 0) {
-            users = await User.find({ "info.bloodGroup": bloodGroup, "address.state": state });
-        }
-
-        // Step 4: Create notifications for all matching users
-        const notifications = users.map((user) => ({
-                userId: user._id,
-                type: "blood_request",
-                message: `A blood request for ${bloodGroup} is needed in ${city}.`,
-                redirectUrl: `/blood-requests/${savedBloodRequest._id}`, // Redirect URL
-                data: { bloodRequestId: savedBloodRequest._id },
-            }))
-
-        // Step 5: Save notifications to the database
-        console.log(notifications);
-        
-        try {
-            await Notification.insertMany(notifications);
-            console.log("Notifications inserted successfully");
-        } catch (error) {
-            console.error("Error inserting notifications:", error.message);
-        }
-        
-
-        // Step 4: Generate notifications and emit them via WebSocket
-        users.forEach(async (user) => {
-            notifications.forEach((notification) => {
-                io.to(user._id.toString()).emit("bloodRequest", {
-                    type: notification.type,
-                    message: notification.message || "An urgent blood request is needed in your area",
-                    redirectUrl: notification.redirectUrl || `/blood-requests/${savedBloodRequest._id}`,
-                    data: notification.data || { bloodRequestId: savedBloodRequest._id },
-                });
-            });
+        // Find matching users with hierarchical location search
+        let users = await User.find({ 
+            "info.bloodGroup": bloodGroup, 
+            "address.city": city 
         });
         
+        if (users.length === 0) {
+            users = await User.find({ 
+                "info.bloodGroup": bloodGroup, 
+                "address.district": district 
+            });
+        }
+        
+        if (users.length === 0) {
+            users = await User.find({ 
+                "info.bloodGroup": bloodGroup, 
+                "address.state": state 
+            });
+        }
 
+        // Create one notification per user
+        const notifications = await Promise.all(users.map(async (user) => {
+            try {
+                const notification = await Notification.create({
+                    userId: user._id,
+                    type: "blood_request",
+                    message: `A blood request for ${bloodGroup} is needed in ${city}.`,
+                    redirectUrl: `/blood-requests/${savedBloodRequest._id}`,
+                    data: { bloodRequestId: savedBloodRequest._id },
+                });
+                
+                // Emit websocket event to the specific user
+                io.to(user._id.toString()).emit("bloodRequest", {
+                    type: notification.type,
+                    message: notification.message,
+                    redirectUrl: notification.redirectUrl,
+                    data: notification.data,
+                });
+
+                return notification;
+            } catch (error) {
+                console.error(`Error creating notification for user ${user._id}:`, error.message);
+                return null;
+            }
+        }));
+
+        // Filter out failed notifications
+        const successfulNotifications = notifications.filter(notification => notification !== null);
+        
+        // Add logging to help debug
+        console.log(`Created ${successfulNotifications.length} notifications for blood request ${savedBloodRequest._id}`);
+        
         return res.status(201).json(
             new ApiResponse(201, "Blood request created successfully", {
                 bloodRequest: savedBloodRequest,
+                notificationsSent: successfulNotifications.length
             })
         );
     } catch (error) {
+        console.error("Error in createBloodRequest:", error);
         return res.status(500).json(
             new ApiResponse(500, error?.message || "Something went wrong while creating blood request")
         );
