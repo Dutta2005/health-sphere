@@ -3,9 +3,9 @@ import { MessageSquareMore } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { api } from '../api/api';
 import CreatePost from '../components/discussion/CreatePost';
-import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Button } from "../components/ui/button";
 import DiscussionPostSkeleton from '../components/discussion/DiscussionPostSkeleton';
+import PostCard from '../components/discussion/PostCard';
 
 interface Author {
     name?: string;
@@ -49,14 +49,6 @@ const DiscussionsPage: React.FC = () => {
         fetchPosts(1);
     };
 
-    const formatDate = (dateString: string) => {
-        return new Date(dateString).toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-        });
-    };
-
     useEffect(() => {
         fetchPosts();
     }, []);
@@ -90,27 +82,7 @@ const DiscussionsPage: React.FC = () => {
             <div className="flex flex-col space-y-4">
                 {posts.map((post) => (
                     <Link key={post._id} to={`/discussions/${post._id}`}>
-                        <Card className="hover:shadow-lg transition-shadow">
-                            <CardHeader>
-                                <CardTitle className="flex justify-between items-center">
-                                    <span>{post.title}</span>
-                                    {post.tags && post.tags.length > 0 && (
-                                        <span className="text-xs bg-secondary/20 text-secondary-dark px-2 py-1 rounded-full">
-                                            {post.tags[0]}
-                                        </span>
-                                    )}
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                <p className="text-gray-600 dark:text-gray-300 mb-4 line-clamp-3 break-words">
-                                    {post.content}
-                                </p>
-                                <div className="flex justify-between items-center text-sm text-gray-500 dark:text-gray-400">
-                                    <span>{post.author?.name || "Anonymous"}</span>
-                                    <span>{formatDate(post.createdAt)}</span>
-                                </div>
-                            </CardContent>
-                        </Card>
+                        <PostCard post={post} />
                     </Link>
                 ))}
             </div>

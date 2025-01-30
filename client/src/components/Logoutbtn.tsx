@@ -13,8 +13,8 @@ function Logoutbtn() {
     const signOut = async() => {
         try {
             const response = await api.post('/users/logout')
+            dispatch(logout())
             if(response.status === 200){
-                dispatch(logout())
                 toast({
                     title: "Logout Successful",
                     description: "You have successfully logged out.",
@@ -25,7 +25,7 @@ function Logoutbtn() {
             }
         } catch (error: any) {
             toast({
-                title: "Logout Failed",
+                title: "Something went wrong",
                 description: error.response?.data?.message || "Something went wrong",
                 variant: "destructive",
                 duration: 2000
@@ -33,7 +33,7 @@ function Logoutbtn() {
         }
     }
     return (
-        <button className="w-full flex items-center justify-center gap-2 text-red-600" onClick={signOut}>
+        <button className="w-full flex items-center justify-center gap-2 text-red-600 text-xl" onClick={signOut}>
             <span>Logout</span>
             <LogOut className="w-5 h-5" />
         </button>
