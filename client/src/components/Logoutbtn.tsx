@@ -21,8 +21,8 @@ function Logoutbtn() {
                     variant: "success",
                     duration: 3000
                 })
-                navigate('/', {replace: true})
             }
+            navigate('/', {replace: true})
         } catch (error: any) {
             toast({
                 title: "Something went wrong",
