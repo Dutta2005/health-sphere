@@ -11,9 +11,8 @@ import { Marquee } from "../components/ui/marquee";
 
 const HeroBackground = () => (
   <div className="absolute inset-0 overflow-hidden">
-    <div className="absolute top-0 right-0 w-[500px] h-[500px] rounded-full bg-primary opacity-10 blur-[100px] animate-pulse" />
-    <div className="absolute bottom-0 left-0 w-[500px] h-[500px] rounded-full bg-accent opacity-10 blur-[100px] animate-pulse delay-1000" />
-    <div className="absolute top-1/2 left-1/2 w-[600px] h-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-secondary opacity-5 blur-[120px] animate-pulse delay-500" />
+    <div className="absolute top-0 right-0 w-[500px] h-[500px] rounded-full bg-primary opacity-10 blur-[100px]" />
+    <div className="absolute bottom-0 left-0 w-[500px] h-[500px] rounded-full bg-accent opacity-10 blur-[100px]" />
   </div>
 );
 
@@ -82,7 +81,7 @@ function LandingPage() {
     _id: "7",
     title: "How to reduce sugar cravings?",
     content: "I struggle with sugar cravings. Any natural ways to reduce them?",
-    author: { name: "eera" },
+    author: { name: "Meera" },
     createdAt: "2025-01-25T20:55:00Z",
     tags: ["advice"],
   },]
@@ -160,7 +159,7 @@ function LandingPage() {
 
       {/* Stats Section */}
       <section className="container mx-auto px-4 -mt-24 relative z-10">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
           {stats.map(({ icon: Icon, label, value, suffix, color }) => (
             <Card 
               key={label}
@@ -209,7 +208,7 @@ function LandingPage() {
           <div className="text-center mb-12 space-y-4">
             <h2 className="text-4xl lg:text-5xl font-bold">Chit Chat</h2>
             <p className="text-xl text-light-text/70 dark:text-dark-text/70">
-              Join the conversation and connect with others
+              Share your thoughts and experiences with other blood donors.
             </p>
           </div>
           <div className="relative  md:mx-12 lg:mx-20">

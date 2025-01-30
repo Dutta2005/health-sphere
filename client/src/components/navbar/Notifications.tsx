@@ -13,7 +13,7 @@ function Notifications() {
                 <button className="relative dark:text-dark-text">
                     <Bell size={20} />
                     {notifications.length > 0 && (
-                        <span className="absolute -top-1 -right-1 w-4 h-4 bg-accent text-sm text-white rounded-full flex items-center justify-center">
+                        <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-600 text-sm text-white rounded-full flex items-center justify-center">
                             {notifications.length}
                         </span>
                     )}
