@@ -168,20 +168,23 @@ const createBloodRequest = asyncHandler(async (req, res) => {
         // Find matching users with hierarchical location search
         let users = await User.find({ 
             "info.bloodGroup": bloodGroup, 
-            "address.city": city 
+            "address.city": city,
+            _id: { $ne: req.user._id }
         });
         
         if (users.length === 0) {
             users = await User.find({ 
                 "info.bloodGroup": bloodGroup, 
-                "address.district": district 
+                "address.district": district,
+                _id: { $ne: req.user._id } 
             });
         }
         
         if (users.length === 0) {
             users = await User.find({ 
                 "info.bloodGroup": bloodGroup, 
-                "address.state": state 
+                "address.state": state,
+                _id: { $ne: req.user._id } 
             });
         }
 
