@@ -155,6 +155,8 @@ import {Comment} from "../models/comment.model.js"
 import {ApiError} from "../utils/apiError.js"
 import {ApiResponse} from "../utils/apiResponse.js"
 import {asyncHandler} from "../utils/asynchandler.js"
+import {Notification} from "../models/notification.model.js"
+import { getIO } from "../utils/webSocket.js"
 
 const getComments = asyncHandler(async (req, res) => {
     const { postId, parentCommentId } = req.params;
@@ -198,6 +200,94 @@ const getComments = asyncHandler(async (req, res) => {
     }));
 });
 
+// const addComment = asyncHandler(async (req, res) => {
+//     const { postId, parentCommentId } = req.params;
+//     const { content } = req.body;
+
+//     if (!content) {
+//         throw new ApiError(400, "Comment content is required");
+//     }
+
+//     if (!postId && !parentCommentId) {
+//         throw new ApiError(400, "Either postId or parentCommentId must be provided");
+//     }
+
+//     const commentData = {};
+
+//     // Determine comment creator based on available information
+//     if (req.user) {
+//         commentData.user = req.user._id;
+//     } else if (req.organization) {
+//         commentData.organization = req.organization._id;
+//     } else {
+//         throw new ApiError(401, "Authentication required");
+//     }
+
+//     commentData.content = content;
+
+//     if (postId) {
+//         if (!mongoose.isValidObjectId(postId)) {
+//             throw new ApiError(400, "Invalid post id");
+//         }
+//         commentData.post = postId;
+//     }
+
+//     if (parentCommentId) {
+//         if (!mongoose.isValidObjectId(parentCommentId)) {
+//             throw new ApiError(400, "Invalid parent comment id");
+//         }
+        
+//         const parentComment = await Comment.findById(parentCommentId);
+//         if (!parentComment) {
+//             throw new ApiError(404, "Parent comment not found");
+//         }
+        
+//         commentData.parentComment = parentCommentId;
+//     }
+
+//     const comment = await Comment.create(commentData);
+
+//     if (parentCommentId) {
+//         await Comment.findByIdAndUpdate(parentCommentId, {
+//             $push: { replies: comment._id }
+//         });
+//     }
+
+//     return res.status(201).json(new ApiResponse(201, "Comment added successfully", { comment }));
+// });
+
+
+
+const createNotification = async ({
+    userId,
+    message,
+    type = "other",
+    redirectUrl,
+    data = {}
+}) => {
+    try {
+        const notification = await Notification.create({
+            userId,
+            type,
+            message,
+            redirectUrl,
+            data
+        });
+
+        // Send notification to user
+        const io = getIO();
+        io.to(userId.toString()).emit("receiveNotification", {
+            type,
+            message,
+            redirectUrl,
+            data,
+            createdAt: notification.createdAt
+        });
+    } catch (error) {
+        console.error("Error creating notification:", error);
+    }
+};
+
 const addComment = asyncHandler(async (req, res) => {
     const { postId, parentCommentId } = req.params;
     const { content } = req.body;
@@ -228,6 +318,51 @@ const addComment = asyncHandler(async (req, res) => {
             throw new ApiError(400, "Invalid post id");
         }
         commentData.post = postId;
+
+        // Find post creator to send notification
+        const post = await mongoose.model('Post').findById(postId).select('author') || 
+                    await mongoose.model('OrgPost').findById(postId).select('organization');
+        
+        if (post) {
+            const notificationData = {
+                redirectUrl: `/posts/${postId}`,
+                data: {
+                    postId,
+                    commentId: commentData._id
+                }
+            };
+
+            // If comment is by user
+            if (req.user) {
+                if (post.author) {  
+                    await createNotification({
+                        userId: post.author,  
+                        message: `${req.user.name} commented on your post`,
+                        ...notificationData
+                    });
+                } else if (post.organization) {
+                    await createNotification({
+                        userId: post.organization,  
+                        message: `${req.user.name} commented on your post`,
+                        ...notificationData
+                    });
+                }
+            } else if (req.organization) {
+                if (post.author) {
+                    await createNotification({
+                        userId: post.author,  
+                        message: `${req.organization.name} commented on your post`,
+                        ...notificationData
+                    });
+                } else if (post.organization) {
+                    await createNotification({
+                        userId: post.organization,
+                        message: `${req.organization.name} commented on your post`,
+                        ...notificationData
+                    });
+                }
+            }
+        }
     }
 
     if (parentCommentId) {
@@ -235,12 +370,31 @@ const addComment = asyncHandler(async (req, res) => {
             throw new ApiError(400, "Invalid parent comment id");
         }
         
-        const parentComment = await Comment.findById(parentCommentId);
+        const parentComment = await Comment.findById(parentCommentId)
+            .populate('user', 'name')
+            .populate('organization', 'name');
+
         if (!parentComment) {
             throw new ApiError(404, "Parent comment not found");
         }
         
         commentData.parentComment = parentCommentId;
+
+        // Notify parent comment creator about the reply
+        if (parentComment.user) {
+            await createNotification({
+                userId: parentComment.user._id,
+                message: req.user 
+                    ? `${req.user.name} replied to your comment`
+                    : `${req.organization.name} replied to your comment`,
+                redirectUrl: `/comment/${parentCommentId}`,
+                data: {
+                    postId: parentComment.post,
+                    parentCommentId,
+                    commentId: commentData._id
+                }
+            });
+        }
     }
 
     const comment = await Comment.create(commentData);
@@ -253,6 +407,8 @@ const addComment = asyncHandler(async (req, res) => {
 
     return res.status(201).json(new ApiResponse(201, "Comment added successfully", { comment }));
 });
+
+
 
 const updateComment = asyncHandler(async (req, res) => {
     const { commentId } = req.params;
