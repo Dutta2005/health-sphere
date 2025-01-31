@@ -229,6 +229,35 @@ function LandingPage() {
           </div>
         </div>
       </section>
+
+      {/* Campaigns Section */}
+      <section className="py-12 px-6 text-light-text dark:bg-dark-bg dark:text-dark-text">
+      <div className="max-w-4xl mx-auto text-center">
+        <h2 className="text-3xl font-bold text-primary">Campaigns</h2>
+        <p className="mt-4 text-lg">
+          Designed for organizations like NGOs, health departments, or hospitals to share
+          information about their initiatives.
+        </p>
+      </div>
+
+      <div className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-2">
+        <div className="p-6 bg-white dark:bg-gray-800 rounded-2xl shadow-md">
+          <h3 className="text-xl font-semibold text-secondary">Blood Donation Camp</h3>
+          <p className="mt-2 text-gray-700 dark:text-gray-300">
+            An NGO planning a blood donation camp can post event details, including location, date, and registration
+            process, encouraging more people to participate.
+          </p>
+        </div>
+
+        <div className="p-6 bg-white dark:bg-gray-800 rounded-2xl shadow-md">
+          <h3 className="text-xl font-semibold text-accent">Health Awareness Campaign</h3>
+          <p className="mt-2 text-gray-700 dark:text-gray-300">
+            A campaign on preventing seasonal diseases like dengue or malaria can be posted here, educating the community
+            with infographics, preventive measures, and resources.
+          </p>
+        </div>
+      </div>
+    </section>
     </div>
   );
 }
