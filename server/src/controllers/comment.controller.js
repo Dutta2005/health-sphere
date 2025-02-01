@@ -258,35 +258,48 @@ const getComments = asyncHandler(async (req, res) => {
 
 
 
-const createNotification = async ({
-    userId,
-    message,
-    type = "other",
-    redirectUrl,
-    data = {}
-}) => {
+const createNotification = async ({ userId, message, type = "comment", redirectUrl, data }) => {
     try {
-        const notification = await Notification.create({
+        const existingNotification = await Notification.findOne({
             userId,
             type,
-            message,
             redirectUrl,
-            data
+            createdAt: { $gte: new Date(Date.now() - 5 * 60 * 1000) } // 5-minute window
         });
 
-        // Send notification to user
+        if (existingNotification) {
+            // Extract the count from the existing notification's message
+            const match = existingNotification.message.match(/(\d+) people commented/);
+            let newCount = match ? parseInt(match[1]) + 1 : 2;
+
+            existingNotification.message = `${newCount} people commented on your post`;
+            existingNotification.data = { ...existingNotification.data, ...data };
+            await existingNotification.save();
+        } else {
+            await Notification.create({
+                userId,
+                type,
+                message,
+                redirectUrl,
+                data
+            });
+        }
+
+        // Emit the updated notification
         const io = getIO();
-        io.to(userId.toString()).emit("receiveNotification", {
+        io.to(userId.toString()).emit("comment", {
             type,
             message,
             redirectUrl,
             data,
-            createdAt: notification.createdAt
+            createdAt: new Date()
         });
+
     } catch (error) {
         console.error("Error creating notification:", error);
     }
 };
+
 
 const addComment = asyncHandler(async (req, res) => {
     const { postId, parentCommentId } = req.params;
@@ -325,7 +338,7 @@ const addComment = asyncHandler(async (req, res) => {
         
         if (post) {
             const notificationData = {
-                redirectUrl: `/posts/${postId}`,
+                redirectUrl: `/discussions/${postId}`,
                 data: {
                     postId,
                     commentId: commentData._id

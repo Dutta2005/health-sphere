@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router";
+import { useNavigate } from "react-router-dom";
 import { Bell, CheckCheck, Droplet, Trash2 } from "lucide-react";
 import { Card, CardContent, CardHeader } from "../../components/ui/card";
 import { Button } from "../../components/ui/button";
@@ -45,11 +45,12 @@ const NotificationItem = ({
   notification: Notification;
   onDelete: (id: string) => void;
 }) => {
+  const navigate = useNavigate();
   const bgColor = notification.isRead 
     ? "bg-background hover:bg-accent/5" 
     : "bg-accent/10 hover:bg-accent/15";
 
-  const handleMarkRead = async (e: React.MouseEvent) => {
+  const handleClick = async (e: React.MouseEvent) => {
     e.preventDefault();
     if (!notification.isRead) {
       try {
@@ -58,11 +59,16 @@ const NotificationItem = ({
         console.error('Failed to mark notification as read:', error);
       }
     }
+    // Remove leading slash if present to make path relative
+    const relativePath = notification.redirectUrl.startsWith('/') 
+      ? notification.redirectUrl.slice(1) 
+      : notification.redirectUrl;
+    navigate(`/${relativePath}`);
   };
 
   return (
     <div className="group relative">
-      <Link to={notification.redirectUrl} onClick={handleMarkRead}>
+      <div onClick={handleClick} className="cursor-pointer">
         <Card className={`flex items-center gap-4 p-4 transition-colors ${bgColor}`}>
           <CardHeader className="w-8 h-8 bg-accent/20 dark:bg-accent/30 rounded-full flex items-center justify-center p-0">
             {notification.type === "blood_request" ? (
@@ -83,21 +89,21 @@ const NotificationItem = ({
             <CheckCheck className="text-muted-foreground" size={16} />
           )}
         </Card>
-      </Link>
+      </div>
       <Button
         variant="ghost"
         size="icon"
-        className="absolute right-6 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity"
+        className="absolute right-8 top-1/2 -translate-y-1/2"
         onClick={() => onDelete(notification._id)}
       >
-        <Trash2 className="h-4 w-4 text-muted-foreground hover:text-primary" />
+        <Trash2 className="h-4 w-4 text-primary" />
       </Button>
     </div>
   );
 };
 
 function NotificationPage() {
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -158,6 +164,7 @@ function NotificationPage() {
 
   return (
     <div className="container max-w-2xl mx-auto px-4 py-6 space-y-4">
+      {/* Rest of your JSX remains the same */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <h1 className="text-2xl font-semibold">Notifications</h1>

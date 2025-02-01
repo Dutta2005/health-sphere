@@ -28,11 +28,13 @@ function App() {
     
     const socket = initializeSocket(userId);
 
-    socket.on("bloodRequest", (notification) => {
-      console.log(notification);
-      
+    socket.on("bloodRequest", (notification) => {      
       dispatch(addNotification(notification));
     });
+
+    socket.on("comment", (notification) => {
+      dispatch(addNotification(notification));
+    })
 
     return () => {
       socket.disconnect();

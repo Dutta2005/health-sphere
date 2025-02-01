@@ -24,6 +24,7 @@ function Logoutbtn() {
             }
             navigate('/', {replace: true})
         } catch (error: any) {
+            dispatch(logout())
             toast({
                 title: "Something went wrong",
                 description: error.response?.data?.message || "Something went wrong",
@@ -33,7 +34,7 @@ function Logoutbtn() {
         }
     }
     return (
-        <button className="w-full flex items-center justify-center gap-2 text-red-600 text-xl" onClick={signOut}>
+        <button className="w-full flex items-center justify-center gap-2 text-red-600 text-lg" onClick={signOut}>
             <span>Logout</span>
             <LogOut className="w-5 h-5" />
         </button>

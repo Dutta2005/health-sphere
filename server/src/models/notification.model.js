@@ -9,7 +9,7 @@ const notificationSchema = new mongoose.Schema(
         },
         type: {
             type: String,
-            enum: ["blood_request", "other"],
+            enum: ["blood_request", "comment", "other"],
             required: true,
         },
         message: {
