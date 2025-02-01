@@ -20,25 +20,25 @@ function BloodBridge() {
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-8">
-        <Tabs defaultValue="donor" className="w-full max-w-4xl mx-auto">
+      <main className="container mx-auto md:px-4 py-8">
+        <Tabs defaultValue="donor" className="w-full px-1 max-w-4xl mx-auto">
           <TabsList className="flex justify-center space-x-2 p-1 bg-white dark:bg-gray-800 rounded-lg shadow-md mb-6">
             <TabsTrigger
               value="donor"
-              className="flex-1 px-8 py-3 text-base font-semibold rounded-md data-[state=active]:bg-red-600 data-[state=active]:text-white"
+              className="flex-1 px-8 py-3 text-base font-semibold rounded-md data-[state=active]:bg-red-600 dark:data-[state=active]:bg-red-600 data-[state=active]:text-white"
             >
               Be a Donor
             </TabsTrigger>
             <TabsTrigger
               value="requests"
-              className="flex-1 px-8 py-3 text-base font-semibold rounded-md data-[state=active]:bg-red-600 data-[state=active]:text-white"
+              className="flex-1 px-8 py-3 text-base font-semibold rounded-md data-[state=active]:bg-red-600 dark:data-[state=active]:bg-red-600 data-[state=active]:text-white"
             >
               Blood Requests
             </TabsTrigger>
           </TabsList>
 
           {/* Tab Content */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
+          <div className="bg-transparent rounded-lg shadow-lg py-8">
             <TabsContent value="donor" className="space-y-6">
               <RequestForm />
                 <h2 className="text-center mb-8 text-3xl font-bold text-gray-900 dark:text-white">
