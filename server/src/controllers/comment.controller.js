@@ -400,7 +400,8 @@ const addComment = asyncHandler(async (req, res) => {
                 message: req.user 
                     ? `${req.user.name} replied to your comment`
                     : `${req.organization.name} replied to your comment`,
-                redirectUrl: `/comment/${parentCommentId}`,
+                // redirectUrl: `/comment/${parentCommentId}`,
+                redirectUrl: `/discussions/${parentComment.post}`,
                 data: {
                     postId: parentComment.post,
                     parentCommentId,
