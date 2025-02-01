@@ -112,7 +112,7 @@ function Requests() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 dark:bg-dark-bg dark:text-dark-text">
+    <div className="container mx-auto px-1 md:px-4 py-8 ">
       <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
         <div className="flex flex-wrap gap-4">
           <Select

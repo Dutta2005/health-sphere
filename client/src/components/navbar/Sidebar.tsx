@@ -38,7 +38,7 @@ function Sidebar() {
     <Sheet>
       <SheetTrigger asChild className="h-10 w-10 bg-transparent lg:hidden">
         <Button
-          variant="outline"
+          variant="ghost"
           size="icon"
           className="hover:bg-primary/10 transition-colors dark:text-dark-text border-none"
         >
