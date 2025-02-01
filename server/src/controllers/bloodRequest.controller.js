@@ -195,7 +195,8 @@ const createBloodRequest = asyncHandler(async (req, res) => {
                     userId: user._id,
                     type: "blood_request",
                     message: `A blood request for ${bloodGroup} is needed in ${city}.`,
-                    redirectUrl: `/blood-requests/${savedBloodRequest._id}`,
+                    // redirectUrl: `/blood-requests/${savedBloodRequest._id}`,
+                    redirectUrl: `/bloodbridge/`,
                     data: { bloodRequestId: savedBloodRequest._id },
                 });
                 
