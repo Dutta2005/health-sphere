@@ -2,6 +2,7 @@ import { asyncHandler } from "../utils/asynchandler.js";
 import { OrgPost as Post } from "../models/orgPost.model.js";
 import { ApiError } from "../utils/apiError.js";
 import { ApiResponse } from "../utils/apiResponse.js";
+import { uploadOnCloudinary, deleteFromCloudinary } from "../utils/cloudinary.js";
 
 // create a new post
 const createPost = asyncHandler(async(req, res) => {
@@ -11,11 +12,26 @@ const createPost = asyncHandler(async(req, res) => {
     if (!title || !content) {
         throw new ApiError(400, "Title and content are required");
     }
+
+    const file = req.files?.thumbnail?.[0];
+
+    let thumbnail;
+
     try {
+
+        if (file) {
+            thumbnail = await uploadOnCloudinary(file.buffer);
+        }
+
+        if (!thumbnail) {
+            throw new ApiError(500, "Failed to upload thumbnail");
+        }
+
         const post = await Post.create({
             title,
             content,
             tags: tags || [],
+            thumbnail: thumbnail?.url || "",
            organization: organization._id
         });
 
@@ -146,6 +162,16 @@ const deletePost = asyncHandler(async(req, res) => {
     
         if (!post) {
             throw new ApiError(404, "Post not found");
+        }
+
+        if (post.thumbnail) {
+            const urlParts = post.thumbnail.split('/');
+            const publicId = urlParts[urlParts.length - 1].split('.')[0];
+
+            const deleteImage = await deleteFromCloudinary(publicId);
+            if (!deleteImage) {
+                throw new ApiError(500, "Failed to delete thumbnail");
+            }
         }
     
         return res.status(200).json(

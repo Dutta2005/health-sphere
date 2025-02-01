@@ -18,6 +18,10 @@ const postSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Organization',
         required: true
+    },
+    thumbnail: {
+        type: String,
+        default: ''
     }
 }, {
     timestamps: true
