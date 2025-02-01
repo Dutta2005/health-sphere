@@ -52,7 +52,11 @@ function Notifications() {
                                 <p className="text-center text-muted-foreground">No new notifications</p>
                             ) : (
                                 notifications.map((notification) => (
-                                    <Link to={notification.redirectUrl} key={notification._id} className="flex items-start gap-4 mb-4 last:mb-0">
+                                    <Link 
+                                        to={notification.redirectUrl} 
+                                        key={notification._id || `${notification.type}-${notification.createdAt}`} 
+                                        className="flex items-start gap-4 mb-4 last:mb-0"
+                                    >
                                         <div className="w-8 h-8 bg-accent/10 rounded-full flex items-center justify-center shrink-0">
                                             {notification.type === "blood_request" ? (
                                                 <Droplet className="text-primary" size={16} />
