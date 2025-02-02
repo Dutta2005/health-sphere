@@ -14,6 +14,7 @@ import { RootState } from "../../store/store";
 import { toggleTheme } from "../../store/themeSlice";
 import { Switch } from "../ui/switch";
 import Logoutbtn from "../Logoutbtn";
+import { ScrollArea } from "../ui/scroll-area";
 
 function Sidebar() {
   const dispatch = useDispatch();
@@ -56,6 +57,7 @@ function Sidebar() {
           </SheetTitle>
         </SheetHeader>
 
+        <ScrollArea className="h-full">
         <nav className="mt-8 flex flex-col gap-2">
           <NavLink to="/profile" className={({ isActive }) => `${navLinkClasses({ isActive })} ${isAuthenticated ? "" : "hidden"}`}>
             Profile
@@ -90,6 +92,7 @@ function Sidebar() {
             </div>
           )}
         </nav>
+        </ScrollArea>
       </SheetContent>
     </Sheet>
   );
