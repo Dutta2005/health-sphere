@@ -40,7 +40,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isLoggedIn, theme }) => {
     <Sheet>
       <SheetTrigger asChild className="h-10 w-10 mr-2">
         <Button
-          variant="outline"
+          variant="ghost"
           size="icon"
           className="hover:bg-primary/10 transition-colors dark:text-dark-text"
         >

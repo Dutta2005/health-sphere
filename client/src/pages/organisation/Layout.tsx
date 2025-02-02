@@ -25,7 +25,7 @@ function Layout() {
                 <h1 className="text-2xl font-bold bg-gradient-to-r from-accent to-primary bg-clip-text text-transparent">
                   Health<span className="font-extrabold">Sphere</span>
                 </h1>
-                <p className="text-xs text-light-text dark:text-dark-text text-right">for Organizations</p>
+                <p className="text-xs text-light-text/75 dark:text-dark-text/70 text-right -mt-1">for Organizations</p>
               </div>
             </div>
                 <Sidebar isLoggedIn={isLoggedIn} theme={theme} />
