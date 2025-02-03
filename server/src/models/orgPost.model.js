@@ -11,8 +11,8 @@ const postSchema = new mongoose.Schema({
         required: true
     },
     tags: {
-        type: [String],
-        default: []
+        type: String,
+        default: ""
     },
     organization: {
         type: mongoose.Schema.Types.ObjectId,

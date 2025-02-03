@@ -85,13 +85,6 @@ export const initializeWebSocket = (server) => {
         });
     });
 
-    // Periodic logging of server status
-    setInterval(() => {
-        const rooms = io.sockets.adapter.rooms;
-        console.log('Current rooms:', Array.from(rooms.keys()));
-        console.log('Connected clients:', io.sockets.sockets.size);
-    }, 30000);
-
     return io;
 };
 

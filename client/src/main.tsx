@@ -27,6 +27,7 @@ import NotificationPage from './pages/account/NotificationPage.tsx'
 import MedicalChatbot from './pages/Chatbot.tsx'
 import Protected from './components/layouts/Protected.tsx'
 import PublicRoutes from './components/layouts/PublicRoutes.tsx'
+import PostForm from './components/organisation/post/PostForm.tsx'
 
 const router = createBrowserRouter([
   {
@@ -64,7 +65,9 @@ const router = createBrowserRouter([
       { path: '*' , element: <Error404 /> },
       { path: 'posts', element: <Protected role="organization"><OrgPost /></Protected> },
       { path: 'org-profile/:id', element: <OrgProfile /> },
-      { path: 'post/:id', element: <OrgPostView /> }
+      { path: 'post/:id', element: <OrgPostView /> },
+      { path: 'create', element: <Protected role="organization"><PostForm /></Protected> },
+      { path: 'edit/:id', element: <Protected role="organization"><PostForm /></Protected> }
     ]
   },
   { path: 'register', element: <PublicRoutes role="organization"><OrganizationSignup /></PublicRoutes> },

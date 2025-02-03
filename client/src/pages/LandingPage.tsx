@@ -218,10 +218,10 @@ function LandingPage() {
               Are you an organization?
             </p>
             <Link
-              to="/register"
+              to="/organisation"
               className="inline-flex items-center gap-2 text-gray-900 dark:text-dark-text rounded-full px-8 py-4 text-lg font-medium transition-all duration-300 transform hover:scale-105 relative overflow-hidden group"
             >
-              <span className="relative z-10">Be a Part of This Movement</span>
+              <span className="relative z-10">Checkout</span>
               <ArrowRight className="w-5 h-5 relative z-10 group-hover:translate-x-1 transition-transform" />
               <BorderBeam />
             </Link>
