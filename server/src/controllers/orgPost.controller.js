@@ -14,7 +14,7 @@ const createPost = asyncHandler(async(req, res) => {
     }
 
     const file = req.files?.thumbnail?.[0];
-
+    
     let thumbnail;
 
     try {
@@ -23,14 +23,14 @@ const createPost = asyncHandler(async(req, res) => {
             thumbnail = await uploadOnCloudinary(file.buffer);
         }
 
-        if (!thumbnail) {
+        if (!thumbnail && file) {
             throw new ApiError(500, "Failed to upload thumbnail");
         }
 
         const post = await Post.create({
             title,
             content,
-            tags: tags || [],
+            tags: tags,
             thumbnail: thumbnail?.url || "",
            organization: organization._id
         });
@@ -56,7 +56,7 @@ const createPost = asyncHandler(async(req, res) => {
 const getAllPosts = asyncHandler(async(req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
-        const limit = 15; 
+        const limit = parseInt(req.query.limit) || 15; 
         const skip = (page - 1) * limit; 
 
         const totalPosts = await Post.countDocuments();
@@ -107,8 +107,11 @@ const getPostById = asyncHandler(async(req, res) => {
 // get posts by organization id
 const getPostsByOrganizationId = asyncHandler(async(req, res) => {
     try {
+
+        // const organizationId = req.organization._id;
         const organizationId = req.params.id;
-        const posts = await Post.find({ organization: organizationId });
+        const posts = await Post.find({ organization: organizationId }).sort({ createdAt: -1 });
+
         if (!posts) {
             throw new ApiError(500, "Something went wrong while fetching Posts");
         }

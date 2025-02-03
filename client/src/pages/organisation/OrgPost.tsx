@@ -18,6 +18,8 @@ interface Post {
   _id: string;
   title: string;
   content: string;
+  tags: string;
+  thumbnail: string;
   organization: {
     _id: string;
     name: string;
@@ -37,19 +39,26 @@ const PostCard = ({ post }: { post: Post }) => {
     >
       <Card className="rounded-lg shadow-md hover:shadow-lg transition-all duration-300 border-l-4 border-l-accent mb-2">
         <CardHeader>
-          <Link
-            to={`/${
-              role === "organization" ? "organisation/" : ""
-            }org-profile/${post.organization._id}`}
-            className="flex items-center gap-3 mb-1 -ml-2"
-          >
-            <div className="bg-accent/10 p-2 rounded-full">
-              <Landmark size={16} className="text-accent" />
-            </div>
-            <h2 className="font-medium text-sm text-secondary-foreground">
-              {post.organization.name}
-            </h2>
-          </Link>
+          <div className="flex items-center justify-between">
+            <Link
+              to={`/${
+                role === "organization" ? "organisation/" : ""
+              }org-profile/${post.organization._id}`}
+              className="flex items-center gap-3 mb-1 -ml-2"
+            >
+              <div className="bg-accent/10 p-2 rounded-full">
+                <Landmark size={16} className="text-accent" />
+              </div>
+              <h2 className="font-medium text-sm text-secondary-foreground">
+                {post.organization.name}
+              </h2>
+            </Link>
+            {post.tags && (
+              <p className="bg-accent text-white rounded-full px-3 py-1 text-xs font-medium">
+                {post.tags}
+              </p>
+            )}
+          </div>
           <h2 className="text-lg font-semibold text-foreground hover:text-accent transition-colors duration-200">
             {post.title}
           </h2>
@@ -59,6 +68,13 @@ const PostCard = ({ post }: { post: Post }) => {
           <p className="text-muted-foreground leading-relaxed">
             {truncateContent(post.content, 50)}
           </p>
+          {post.thumbnail && (
+            <img
+              src={post.thumbnail}
+              alt={post.title}
+              className="w-full h-48 object-cover rounded-md mb-4"
+            />
+          )}
         </CardContent>
         <CardFooter className="-mt-2">
           <p className="text-xs text-gray-500 text-muted-foreground">

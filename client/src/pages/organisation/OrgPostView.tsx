@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router";
 import { formatDistanceToNow } from "date-fns";
-import { Landmark, Calendar, RefreshCw } from "lucide-react";
+import { Landmark, Calendar } from "lucide-react";
 import { api } from "../../api/api";
 import {
   Card,
@@ -19,12 +19,13 @@ interface Post {
   _id: string;
   title: string;
   content: string;
+  tags: string;
+  thumbnail: string;
   organization: {
     _id: string;
     name: string;
   };
   createdAt: string;
-  updatedAt: string;
 }
 
 function OrgPostView() {
@@ -53,7 +54,10 @@ function OrgPostView() {
 
   if (error) {
     return (
-      <Alert variant="destructive" className="max-w-3xl mx-auto mt-8 bg-primary/10 border-primary">
+      <Alert
+        variant="destructive"
+        className="max-w-3xl mx-auto mt-8 bg-primary/10 border-primary"
+      >
         <AlertTitle>Error</AlertTitle>
         <AlertDescription>{error}</AlertDescription>
       </Alert>
@@ -68,7 +72,9 @@ function OrgPostView() {
     return (
       <Alert className="max-w-3xl mx-auto mt-8 bg-secondary/10 border-secondary">
         <AlertTitle>Not Found</AlertTitle>
-        <AlertDescription>The requested post could not be found.</AlertDescription>
+        <AlertDescription>
+          The requested post could not be found.
+        </AlertDescription>
       </Alert>
     );
   }
@@ -79,7 +85,9 @@ function OrgPostView() {
         <CardHeader className="space-y-6 pb-6">
           <div className="flex items-center justify-between">
             <Link
-              to={`/${role === "organization" ? "organisation/" : ""}org-profile/${post.organization._id}`}
+              to={`/${
+                role === "organization" ? "organisation/" : ""
+              }org-profile/${post.organization._id}`}
               className="flex items-center gap-3 group"
             >
               <div className="bg-accent/10 p-3 rounded-full group-hover:bg-accent/20 transition-colors duration-200">
@@ -91,41 +99,43 @@ function OrgPostView() {
                 </h2>
               </div>
             </Link>
-            
-            <div className="flex items-center gap-4 text-sm text-light-text/70 dark:text-dark-text/70">
-              <div className="flex items-center gap-2">
-                <Calendar className="w-4 h-4 text-secondary" />
-                <span>{formatDistanceToNow(new Date(post.createdAt), { addSuffix: true })}</span>
-              </div>
-              {post.updatedAt !== post.createdAt && (
-                <div className="flex items-center gap-2">
-                  <RefreshCw className="w-4 h-4 text-secondary" />
-                  <span>{formatDistanceToNow(new Date(post.updatedAt), { addSuffix: true })}</span>
-                </div>
-              )}
-            </div>
+            {post.tags && (
+              <p className="bg-accent text-white rounded-full px-3 py-1 text-xs font-medium">
+                {post.tags}
+              </p>
+            )}
           </div>
 
           <div>
-            <h1 className="text-2xl font-bold leading-tight">
-              {post.title}
-            </h1>
+            <h1 className="text-2xl font-bold leading-tight">{post.title}</h1>
           </div>
         </CardHeader>
 
         <hr className="bg-light-text/10" />
-        
+
         <CardContent className="py-8">
-          <p className="leading-relaxed whitespace-pre-wrap">
-            {post.content}
-          </p>
+          <p className="leading-relaxed whitespace-pre-wrap">{post.content}</p>
+          {post.thumbnail && (
+            <img
+              src={post.thumbnail}
+              alt={post.title}
+              className="w-full h-48 object-cover rounded-md my-4"
+            />
+          )}
+          <div className="flex items-center gap-2 mt-5">
+            <Calendar className="w-4 h-4 text-secondary" />
+            <span>
+              {formatDistanceToNow(new Date(post.createdAt), {
+                addSuffix: true,
+              })}
+            </span>
+          </div>
         </CardContent>
 
         <hr className="bg-light-text/10" />
-        
-        <CardFooter className="pt-6">
 
-            <CommentSection postId={post._id} />
+        <CardFooter className="pt-6">
+          <CommentSection postId={post._id} />
         </CardFooter>
       </Card>
     </div>
