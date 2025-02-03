@@ -107,9 +107,11 @@ const getPostById = asyncHandler(async(req, res) => {
 // get posts by organization id
 const getPostsByOrganizationId = asyncHandler(async(req, res) => {
     try {
+
         // const organizationId = req.organization._id;
         const organizationId = req.params.id;
         const posts = await Post.find({ organization: organizationId }).sort({ createdAt: -1 });
+
         if (!posts) {
             throw new ApiError(500, "Something went wrong while fetching Posts");
         }
