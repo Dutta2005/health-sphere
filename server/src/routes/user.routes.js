@@ -29,7 +29,7 @@ router.post("/change-password", changeCurrentPassword);
 router.patch("/update", updateUser);
 router.get("/search", searchDonors);
 router.patch("/donation-status", updateDonationStatus);
-router.get("/current-user", getCurrentUser);
+router.get("/current-user/details", getCurrentUser);
 
 
 export default router;

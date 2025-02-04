@@ -138,9 +138,11 @@ const PostCard = ({ post }: { post: Post }) => {
                             <div className="p-1 rounded-full bg-gray-100 dark:bg-gray-700">
                                 <User className="w-3 h-3" />
                             </div>
-                            <span className="hover:text-accent transition-colors">
-                                {post.author?.name || "Anonymous"}
+                            { post.author?.name && (
+                                <span className="hover:text-accent transition-colors">
+                                {post.author?.name}
                             </span>
+                            )}
                         </div>
                         <div className="flex items-center gap-2">
                             <div className="p-1 rounded-full bg-gray-100 dark:bg-gray-700">

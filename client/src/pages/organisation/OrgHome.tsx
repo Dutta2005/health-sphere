@@ -9,7 +9,7 @@ function OrgHome() {
     return (
         <div>
             {isAuthenticated ? (
-            <div className="my-7">
+            <div className="py-7">
                 <Header />
                 <PastActivities />
             </div>
