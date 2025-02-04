@@ -92,8 +92,8 @@ const getPostById = asyncHandler(async(req, res) => {
 // get posts by user id
 const getPostsByUserId = asyncHandler(async(req, res) => {
     try {
-        const authorId = req.user._id;
-        const posts = await Post.find({ author: authorId });
+        const authorId = req.params.id;
+        const posts = await Post.find({ author: authorId }).sort({ createdAt: -1 });
         if (!posts) {
             throw new ApiError(500, "Something went wrong while fetching Posts");
         }
