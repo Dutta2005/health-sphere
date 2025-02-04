@@ -58,12 +58,13 @@ https://health-sphere-eight.vercel.app/ -->
 
 ### Steps
 1. Clone the repository
-   bash
+  ``` bash
    git clone https://github.com/yourusername/health-sphere.git
    cd health-sphere
+  ```
    
 2. Install dependencies
-    bash
+   ``` bash
     # for client directory
    cd client 
    npm install
@@ -71,9 +72,10 @@ https://health-sphere-eight.vercel.app/ -->
     # for server directory
    cd server
    npm install
+   ```
    
 3. Configure environment variables
-   bash
+   ```bash
    # for client directory
    cd client 
    cp .env.example .env
@@ -83,9 +85,10 @@ https://health-sphere-eight.vercel.app/ -->
    cd server 
    cp .env.example .env
    # Edit .env with your configurations
+   ```
    
 4. Start the project locally
-   bash
+  ``` bash
    # frontend start
    cd client 
    npm run dev
@@ -93,6 +96,7 @@ https://health-sphere-eight.vercel.app/ -->
    # backend start
    cd server 
    npm run dev
+  ```
    
 
 ### Quick Start
