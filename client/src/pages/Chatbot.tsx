@@ -94,16 +94,13 @@ const MedicalChatbot: React.FC = () => {
         </CardHeader>
         
         <CardContent className="flex-grow flex flex-col gap-4 p-0 overflow-hidden">
-          {/* Message History with ScrollArea */}
             <MessageList 
               messages={messages}
               isLoading={isLoading}
               messagesEndRef={messagesEndRef}
             />
 
-          {/* Input Section */}
           <div className="space-y-4 p-4 border-t shrink-0">
-            {/* Symptoms Tags */}
             <div className="flex flex-wrap gap-2 min-h-[32px]">
               {symptoms.map(symptom => (
                 <div
@@ -121,7 +118,6 @@ const MedicalChatbot: React.FC = () => {
               ))}
             </div>
             
-            {/* Symptom Input */}
             <div className="flex gap-2">
               <Input
                 value={currentSymptom}
@@ -140,7 +136,6 @@ const MedicalChatbot: React.FC = () => {
               </Button>
             </div>
 
-            {/* Message Input */}
             <div className="flex gap-2">
               <Input
                 value={additionalMessage}
