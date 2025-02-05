@@ -30,8 +30,9 @@ const createMedicalPrompt = (userMessage) => {
   const systemPrompt = `You are a medical assistant AI. Provide:
 1. Information about possible conditions based on symptoms
 2. General medical information and advice
+3. Provide home remedies if possible
 4. Discuss medications, their uses, and effects when asked
-4. Reminder to consult healthcare professionals
+5. Reminder to consult healthcare professionals
 
 Keep responses:
 - Direct and clear
