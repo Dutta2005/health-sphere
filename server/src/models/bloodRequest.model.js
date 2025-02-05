@@ -47,7 +47,18 @@ const bloodRequestSchema = new mongoose.Schema({
             type: String, 
             required: true 
         }
-    }
+    },
+    volunteers: [{
+        user: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'User',
+          required: true
+        },
+        canShareDetails: {
+          type: Boolean,
+          default: true
+        }
+      }],
 }, { timestamps: true });
 
 export const BloodRequest = mongoose.model("BloodRequest", bloodRequestSchema);
