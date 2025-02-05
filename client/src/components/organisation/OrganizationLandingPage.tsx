@@ -143,7 +143,7 @@ function OrganizationLandingPage() {
         <div className="max-w-3xl lg:text-center lg:mx-auto">
           <h1 className="font-semibold text-3xl md:text-4xl text-light-text/85 dark:text-dark-text/70">
             <span className="bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent text-5xl md:text-7xl font-bold">
-              Health Sphere
+              <span className="font-samarkan">Jeevan</span> Verse
             </span>
             <br />
             for organisations
@@ -164,7 +164,7 @@ function OrganizationLandingPage() {
             </Button>
             <Button
               variant="outline"
-              className="border-2 border-primary/20 hover:border-primary text-primary dark:text-white px-4 py-5 rounded-lg text-lg transition-all duration-300"
+              className="border-2 dark:border-primary/30 border-primary/20 hover:border-primary text-primary dark:text-white dark:bg-transparent px-4 py-5 rounded-lg text-lg transition-all duration-300"
               onClick={() => navigate("/signin")}
             >
               Sign In

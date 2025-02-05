@@ -13,7 +13,8 @@ export default {
   			ibm: [
   				'IBM Plex Sans',
   				'sans-serif'
-  			]
+  			],
+			samarkan: [ 'Samarkan', 'sans-serif']
   		},
   		colors: {
   			primary: {

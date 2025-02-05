@@ -187,7 +187,7 @@ function LandingPage() {
             </div>
             <h1 className="text-6xl md:text-7xl font-bold tracking-tight">
               <span className="bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent animate-gradient">
-                Health Sphere
+                <span className="font-samarkan">Jeevan</span> Verse
               </span>
             </h1>
             <p className="text-lg md:text-xl text-light-text/80 dark:text-dark-text/80 max-w-2xl mx-auto leading-relaxed">

@@ -43,7 +43,7 @@ const Navbar = () => {
             to="/"
             className={'text-xl font-semibold'}
           >
-            <span className="text-accent">Health</span> <span className="text-primary">Sphere</span>
+            <span className="text-accent font-samarkan">Jeevan</span> <span className="text-primary">Verse</span>
           </NavLink>
 
           {/* Center - Navigation */}
