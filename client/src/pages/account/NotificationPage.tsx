@@ -48,7 +48,7 @@ const NotificationItem = ({
   const navigate = useNavigate();
   const bgColor = notification.isRead 
     ? "bg-background hover:bg-accent/5" 
-    : "bg-accent/10 hover:bg-accent/15";
+    : "bg-accent/10 dark:bg-accent/70 hover:bg-accent/15";
 
   const handleClick = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -197,14 +197,14 @@ function NotificationPage() {
                 </Button>
               </AlertDialogTrigger>
               <AlertDialogContent>
-                <AlertDialogHeader>
+                <AlertDialogHeader className="dark:text-dark-text">
                   <AlertDialogTitle>Clear all notifications?</AlertDialogTitle>
                   <AlertDialogDescription>
                     This action cannot be undone. All notifications will be permanently deleted.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogCancel className="dark:text-dark-text">Cancel</AlertDialogCancel>
                   <AlertDialogAction onClick={deleteAllNotifications}>
                     Continue
                   </AlertDialogAction>

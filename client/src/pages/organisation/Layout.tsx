@@ -22,8 +22,8 @@ function Layout() {
             <div className="flex justify-between px-2 py-2 fixed w-full top-0 backdrop-blur-md z-50"> 
             <div className="flex-shrink-0">
               <div className="flex flex-col">
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-accent to-primary bg-clip-text text-transparent">
-                  Health<span className="font-extrabold">Sphere</span>
+                <h1 className="text-2xl font-bold bg-gradient-to-r from-accent to-primary bg-clip-text text-transparent font-samarkan">
+                  Jeevan<span className="font-extrabold">Verse</span>
                 </h1>
                 <p className="text-xs text-light-text/75 dark:text-dark-text/70 text-right -mt-1">for Organizations</p>
               </div>
