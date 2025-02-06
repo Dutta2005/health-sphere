@@ -81,7 +81,7 @@ const DiscussionsPage: React.FC = () => {
           <Link
             key={post._id}
             to={`/discussions/${post._id}`}
-            className="w-full max-w-2xl" // Controls card width
+            className="w-full max-w-2xl"
           >
             <PostCard post={post} />
           </Link>

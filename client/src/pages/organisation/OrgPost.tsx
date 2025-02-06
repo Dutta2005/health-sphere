@@ -72,11 +72,11 @@ const PostCard = ({ post }: { post: Post }) => {
             <img
               src={post.thumbnail}
               alt={post.title}
-              className="w-full h-48 object-cover rounded-md mb-4"
+              className="w-full h-48 object-cover rounded-md mb-4 border border-gray-200 dark:border-gray-700 mt-3"
             />
           )}
         </CardContent>
-        <CardFooter className="-mt-2">
+        <CardFooter className="-mt-4">
           <p className="text-xs text-gray-500 text-muted-foreground">
             {formatDistanceToNow(new Date(post.createdAt), { addSuffix: true })}
           </p>

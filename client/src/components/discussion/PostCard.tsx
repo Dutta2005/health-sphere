@@ -102,7 +102,7 @@ const PostCard = ({ post }: { post: Post }) => {
     };
 
     return (
-        <Card className="group w-full bg-white dark:bg-gray-800/50 hover:shadow-lg transition-all duration-300 overflow-hidden">
+        <Card className="w-full bg-white dark:bg-transparent hover:shadow-lg transition-all duration-300 overflow-hidden border border-gray-100 dark:border-gray-700">
             {/* Accent line with gradient */}
             <div className="h-1 w-full bg-gradient-to-r from-accent via-accent/80 to-accent/50"></div>
             
