@@ -1,6 +1,6 @@
 import { useSelector, useDispatch } from "react-redux";
 import { NavLink } from "react-router-dom";
-import { Moon, User } from "lucide-react";
+import { Menu, Moon, User } from "lucide-react";
 import {
   NavigationMenu,
   NavigationMenuItem,
@@ -90,7 +90,11 @@ const Navbar = () => {
       `}
     >
       <AvatarFallback>
-        <User className="h-5 w-5 text-light-text dark:text-dark-text" />
+        {isAuthenticated ? (
+          <User className="h-5 w-5 text-light-text dark:text-dark-text" />
+        ) : (
+          <Menu className="h-5 w-5 text-light-text dark:text-dark-text" />
+        )}
       </AvatarFallback>
     </Avatar>
   </DropdownMenuTrigger>

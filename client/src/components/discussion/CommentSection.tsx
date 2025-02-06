@@ -148,8 +148,8 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId }) => {
   };
 
   const getCommentBackground = ( status?: string) => {
-    if (status === 'doctor') return 'bg-green-100/30 dark:bg-green-900/30';
-    if (status === 'medical student') return 'bg-blue-100/80 dark:bg-blue-900/30';
+    if (status === 'doctor') return 'bg-green-200/80 dark:bg-green-900/40';
+    if (status === 'medical student') return 'bg-blue-200/80 dark:bg-blue-900/40';
     return '';
   };
 
@@ -193,7 +193,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId }) => {
   const renderComments = (commentList: Comment[]) => {
     return commentList.map((comment) => {
       const authorDetails = getCommentAuthorDetails(comment);
-      const bgColor = getCommentBackground(authorDetails.type);
+      const bgColor = getCommentBackground(comment.user?.status);
 
       return (
         <div key={comment._id} className={`mb-4 w-full ${bgColor} p-2 rounded-lg`}>
