@@ -71,11 +71,11 @@ ${userProfile}
 
 Provide:
 1. Information about possible conditions based on symptoms, considering the user's health metrics
-2. General medical information and advice tailored to their blood group and body composition
+2. General medical information and advice considering the user's health metrics if applicable
 3. Specific home remedies suitable for their body type and condition
 4. Discuss medications, their uses, and effects when asked, noting any specific considerations based on their health profile
-5. Blood group specific dietary and lifestyle recommendations when relevant
-6. BMI-specific health considerations and advice when applicable
+5. Blood group specific dietary and lifestyle recommendations when asked
+6. BMI-specific health considerations and advice when asked
 
 Keep responses:
 - Direct and clear
