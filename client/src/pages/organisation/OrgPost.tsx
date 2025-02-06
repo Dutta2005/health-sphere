@@ -37,7 +37,7 @@ const PostCard = ({ post }: { post: Post }) => {
     <Link
       to={`/${role === "organization" ? "organisation/" : ""}post/${post._id}`}
     >
-      <Card className="rounded-lg shadow-md hover:shadow-lg transition-all duration-300 border-l-4 border-l-accent mb-2">
+      <Card className="rounded-lg shadow-md hover:shadow-lg transition-all duration-300 border-l-4 border-l-accent dark:border-l-accent mb-2">
         <CardHeader>
           <div className="flex items-center justify-between">
             <Link

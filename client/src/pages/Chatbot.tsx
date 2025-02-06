@@ -90,7 +90,7 @@ const MedicalChatbot: React.FC = () => {
     <div className="flex flex-col h-[93vh] max-w-2xl mx-auto p-4 -mt-5">
       <Card className="flex-grow flex flex-col h-full overflow-hidden">
         <CardHeader className='shrink-0 p-3'>
-          <CardTitle className='text-xl text-center'>Umeed</CardTitle>
+          <CardTitle className='text-2xl text-secondary text-center font-samarkan'>Umeed</CardTitle>
         </CardHeader>
         
         <CardContent className="flex-grow flex flex-col gap-4 p-0 overflow-hidden">
