@@ -97,7 +97,6 @@ function RequestForm() {
       });
 
       if (response.status === 201) {
-        console.log("Blood request created successfully");
         setErrors({});
         setFormData({
           bloodGroup: "" as any,

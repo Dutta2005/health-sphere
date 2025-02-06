@@ -109,30 +109,7 @@ const Navbar = () => {
         : "bg-light-bg/80 text-light-text border-secondary/20"
       }
     `}
-  >
-    {isAuthenticated && (
-      <>
-        <DropdownMenuItem 
-          className="
-            hover:bg-accent/10 
-            rounded-md 
-            transition-colors 
-            focus:bg-accent/10
-          "
-        >
-          <NavLink 
-            to="/profile" 
-            className="flex items-center w-full gap-2"
-          >
-            <User className="h-4 w-4 opacity-70" />
-            Profile
-          </NavLink>
-        </DropdownMenuItem>
-        
-        <div className="border-t border-secondary/20 my-1" />
-      </>
-    )}
-    
+  > 
     <DropdownMenuItem 
       className="
         hover:bg-accent/10 

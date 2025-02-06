@@ -59,9 +59,6 @@ function Sidebar() {
 
         <ScrollArea className="h-full">
         <nav className="mt-8 flex flex-col gap-2">
-          <NavLink to="/profile" className={({ isActive }) => `${navLinkClasses({ isActive })} ${isAuthenticated ? "" : "hidden"}`}>
-            Profile
-          </NavLink>
           {menuOptions.map((option) => (
             <NavLink
               key={option.name}

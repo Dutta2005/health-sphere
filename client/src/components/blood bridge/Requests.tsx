@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
+import { ArrowRight, ChevronLeft, ChevronRight, HandHelping, Loader2 } from "lucide-react";
 import { RootState } from "../../store/store";
 import { api } from "../../api/api";
 import {
@@ -10,9 +10,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "../ui/card";
 import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
+import BeVolunteer from "./BeVolunteer";
+import { Link } from "react-router";
 
 interface Requests {
   bloodRequests: Request[];
@@ -41,6 +49,11 @@ interface Request {
   contactDetails: ContactDetails;
   status: string;
   address: Address;
+  volunteers: [
+    {
+      user: string;
+    }
+  ];
 }
 
 const validBloodGroups = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
@@ -182,7 +195,7 @@ function Requests() {
             {requests?.bloodRequests.map((request) => (
               <Card
                 key={request._id}
-                className="hover:shadow-lg transition-shadow dark:bg-dark-bg "
+                className="hover:shadow-lg transition-shadow dark:bg-dark-bg"
               >
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-xl font-semibold flex gap-3 items-center">
@@ -196,6 +209,11 @@ function Requests() {
                       {request.urgency.toUpperCase()}
                     </Badge>
                   </CardTitle>
+                  <div className="flex gap-4">
+                  <p className="flex items-center text-green-400">
+                    <HandHelping className="w-6 h-6 mr-2" />
+                    <span>{request.volunteers?.length}</span>
+                  </p>
                   <Badge
                     variant="outline"
                     className="border-secondary text-secondary dark:border-dark-text dark:text-dark-text"
@@ -203,6 +221,7 @@ function Requests() {
                     {request.status.charAt(0).toUpperCase() +
                       request.status.slice(1)}
                   </Badge>
+                  </div>
                 </CardHeader>
                 <CardContent>
                   <div className="grid md:grid-cols-2 gap-4">
@@ -230,6 +249,18 @@ function Requests() {
                     </div>
                   </div>
                 </CardContent>
+                <CardFooter className="flex justify-between">
+                  <Link to={`/bloodbridge/request/${request._id}`}
+                  className="text-secondary flex items-center hover:underline font-semibold"
+                  >
+                    View details <ArrowRight className="w-4 h-4 ml-2" />
+                  </Link>
+
+                  {request.bloodGroup === userBG &&
+                    request.status === "pending" && (
+                      <BeVolunteer id={request._id} />
+                    )}
+                </CardFooter>
               </Card>
             ))}
           </div>

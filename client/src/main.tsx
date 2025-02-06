@@ -28,6 +28,7 @@ import MedicalChatbot from './pages/Chatbot.tsx'
 import Protected from './components/layouts/Protected.tsx'
 import PublicRoutes from './components/layouts/PublicRoutes.tsx'
 import PostForm from './components/organisation/post/PostForm.tsx'
+import BloodBridgeRequest from './pages/BloodBridgeRequest.tsx'
 
 const router = createBrowserRouter([
   {
@@ -39,6 +40,10 @@ const router = createBrowserRouter([
       {
         path: 'bloodbridge',
         element: <Protected role="user"><BloodBridge /></Protected>
+      },
+      {
+        path: 'bloodbridge/request/:id',
+        element: <Protected role="user"><BloodBridgeRequest /></Protected>
       },
       {
         path: 'chatbot',
