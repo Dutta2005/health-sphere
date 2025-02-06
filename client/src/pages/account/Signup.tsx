@@ -187,7 +187,7 @@ const Signup = () => {
         email: formData.email,
         password: formData.password,
         age: formData.age,
-        canDonate: formData.canDonate,
+        canDonate: parseInt(formData.age) >= 18,
         address: formData.address,
         status: formData.status,
         info: formData.info,
