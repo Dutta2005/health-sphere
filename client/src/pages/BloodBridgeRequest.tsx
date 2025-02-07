@@ -8,6 +8,7 @@ import { RootState } from "../store/store";
 import { Skeleton } from "../components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "../components/ui/alert";
 import { MapPin, Phone, Mail, Users, Clock } from 'lucide-react';
+import BeVolunteer from "../components/blood bridge/BeVolunteer";
 
 interface Address {
     state: string;
@@ -172,10 +173,13 @@ export default function BloodBridgeRequest() {
                                 </div>
                             </div>
                         </div>
+                        {userId !== request.userId && (
+                            <BeVolunteer id={request._id} />
+                        )}
                     </CardContent>
 
                     {userId === request.userId && (
-                        <CardFooter className="block p-6">
+                        <CardFooter className="block p-6 text-center">
                             <h3 className="font-semibold text-xl text-primary mb-4">Volunteers</h3>
                             <div className="bg-light-bg dark:bg-dark-bg/50 rounded-lg overflow-hidden">
                                 <div className="grid grid-cols-2 bg-secondary/10 p-4">

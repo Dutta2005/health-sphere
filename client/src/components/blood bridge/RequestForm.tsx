@@ -9,6 +9,7 @@ import { State, City } from "country-state-city";
 import { Plus } from "lucide-react";
 import { ScrollArea } from "../ui/scroll-area";
 import { z } from "zod";
+import { useNavigate } from "react-router";
 
 const requestFormSchema = z.object({
   bloodGroup: z.enum(["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"], {
@@ -36,6 +37,7 @@ const requestFormSchema = z.object({
 type FormData = z.infer<typeof requestFormSchema>;
 
 function RequestForm() {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState<FormData>({
     bloodGroup: "" as any,
     urgency: "" as any,
@@ -46,6 +48,8 @@ function RequestForm() {
     district: "",
     city: "",
   });
+
+  const [selectedStateCode, setSelectedStateCode] = useState("");
 
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -108,6 +112,8 @@ function RequestForm() {
           district: "",
           city: "",
         });
+        setSelectedStateCode("");
+        navigate(`/bloodbridge/request/${response.data.data?.bloodRequest._id}`);
       }
     } catch (error) {
       console.error("Error creating blood request:", error);
@@ -118,7 +124,7 @@ function RequestForm() {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button className="dark:bg-dark-bg dark:text-dark-text">
+        <Button className="dark:bg-dark-bg dark:text-dark-text dark:hover:bg-gray-800">
           <Plus className="mr-2" /> Create a Request
         </Button>
       </DialogTrigger>
@@ -230,8 +236,16 @@ function RequestForm() {
                   <div>
                     <Label htmlFor="state">State *</Label>
                     <Select
-                      onValueChange={(value) => handleChange("state", value)}
-                      value={formData.state}
+                      onValueChange={(stateCode) => {
+                        const state = State.getStatesOfCountry("IN").find(
+                          (s) => s.isoCode === stateCode
+                        );
+                        if (state) {
+                          handleChange("state", state.name);
+                          setSelectedStateCode(stateCode);
+                        }
+                      }}
+                      value={selectedStateCode}
                     >
                       <SelectTrigger className={errors.state ? "border-red-500" : ""}>
                         <SelectValue placeholder="Select state" />
@@ -269,13 +283,13 @@ function RequestForm() {
                     <Select
                       onValueChange={(value) => handleChange("city", value)}
                       value={formData.city}
-                      disabled={!formData.state}
+                      disabled={!selectedStateCode}
                     >
                       <SelectTrigger className={errors.city ? "border-red-500" : ""}>
                         <SelectValue placeholder="Select city" />
                       </SelectTrigger>
                       <SelectContent>
-                        {City.getCitiesOfState("IN", formData.state)?.map((city) => (
+                        {City.getCitiesOfState("IN", selectedStateCode)?.map((city) => (
                           <SelectItem key={city.name} value={city.name}>
                             {city.name}
                           </SelectItem>
@@ -290,7 +304,7 @@ function RequestForm() {
               </div>
 
               <div className="pt-4">
-                <Button type="submit" className="w-full">Submit</Button>
+                <Button type="submit" className="w-full dark:hover:bg-gray-700">Submit</Button>
               </div>
             </form>
           </div>

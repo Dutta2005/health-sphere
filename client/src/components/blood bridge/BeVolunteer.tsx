@@ -26,23 +26,16 @@ export default function BeVolunteer({ id }: { id: string }) {
           title: "Success",
           description: "You are now a volunteer for this request",
           variant: "success",
+          duration: 2000,
         });
       }
     } catch (error: any) {
-      console.log(error);
-      if (error.response.status === 400) {
-        toast({
-          title: "Error",
-          description: "You are already a volunteer for this request",
-          variant: "destructive",
-        });
-      } else {
-        toast({
-          title: "Error",
-          description: "Something went wrong",
-          variant: "destructive",
-        });
-      }
+      toast({
+        title: "Error",
+        description: error.response?.data.message || "Something went wrong",
+        variant: "destructive",
+        duration: 3000,
+      });
     }
   };
 
@@ -56,9 +49,11 @@ export default function BeVolunteer({ id }: { id: string }) {
           Be a Volunteer
         </Button>
       </AlertDialogTrigger>
-      <AlertDialogContent>
+      <AlertDialogContent className="dark:bg-dark-bg">
         <AlertDialogHeader>
-          <AlertDialogCancel className="absolute top-4 right-4"><X /></AlertDialogCancel>
+          <AlertDialogCancel className="absolute top-4 right-4 dark:text-dark-text">
+            <X />
+          </AlertDialogCancel>
           <AlertDialogTitle className="dark:text-dark-text">
             Share Details
           </AlertDialogTitle>
