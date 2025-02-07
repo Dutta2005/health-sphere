@@ -151,6 +151,7 @@ const DiscussionPost = () => {
                         <span>Edit</span>
                       </Button>
                     }
+                    currentUserId={userId}
                   />
                   <Button
                     variant="ghost"

@@ -17,8 +17,13 @@ const postSchema = new mongoose.Schema({
     author: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
-        required: true
-    }
+        // required: true
+        default: null
+    },
+    isAnonymous: {
+        type: Boolean,
+        default: false
+    },
 }, {
     timestamps: true
 });
