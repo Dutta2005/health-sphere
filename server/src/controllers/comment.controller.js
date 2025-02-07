@@ -338,7 +338,7 @@ const addComment = asyncHandler(async (req, res) => {
         
         if (post) {
             const notificationData = {
-                redirectUrl: `/discussions/${postId}`,
+                redirectUrl: post === 'Post' ? `/discussions/${postId}` : `/posts/${postId}`,
                 data: {
                     postId,
                     commentId: commentData._id
@@ -401,7 +401,7 @@ const addComment = asyncHandler(async (req, res) => {
                     ? `${req.user.name} replied to your comment`
                     : `${req.organization.name} replied to your comment`,
                 // redirectUrl: `/comment/${parentCommentId}`,
-                redirectUrl: `/discussions/${parentComment.post}`,
+                redirectUrl: parentComment.post === 'Post' ? `/discussions/${parentComment.post}` : `/post/${parentComment.post}` ,
                 data: {
                     postId: parentComment.post,
                     parentCommentId,
