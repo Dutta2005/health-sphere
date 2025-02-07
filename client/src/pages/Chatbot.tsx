@@ -110,8 +110,8 @@ const MedicalChatbot: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col h-[90vh] md:h-[93vh] max-w-3xl mx-auto p-4 -mt-5">
-      <Card className="flex-grow flex flex-col h-full overflow-hidden border dark:border-secondary/50 shadow-xl">
+    <div className="flex flex-col h-[90vh] md:h-[93vh] max-w-3xl mx-auto md:p-4 -mt-5">
+      <Card className="flex-grow flex flex-col h-full overflow-hidden  md:border md:dark:border-secondary/50 shadow-xl rounded-none md:rounded-xl">
         <CardHeader className="shrink-0 px-6 py-4 relative">
           <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-secondary/30 to-transparent" />
           <CardTitle className="text-3xl text-center font-samarkan text-secondary">
@@ -121,7 +121,7 @@ const MedicalChatbot: React.FC = () => {
 
         <CardContent className="flex-grow flex flex-col gap-4 p-0 overflow-hidden">
           {messages.length === 0 && (
-            <div className="text-center space-y-6 text-light-text/90 dark:text-gray-400 p-8 pt-16">
+            <div className="text-center space-y-6 text-light-text/90 dark:text-gray-400 p-8">
               <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-gradient-to-br from-secondary/20 to-primary/20 flex items-center justify-center">
                 <MessageSquare className="w-8 h-8 text-secondary/70" />
               </div>
