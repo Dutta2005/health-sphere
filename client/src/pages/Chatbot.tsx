@@ -133,7 +133,7 @@ const MedicalChatbot: React.FC = () => {
               {symptoms.map((symptom) => (
                 <div
                   key={symptom.id}
-                  className="flex items-center gap-2 bg-primary/10 px-3 py-1 rounded-full text-sm"
+                  className="flex items-center gap-2 bg-primary/80 text-white px-3 py-1 rounded-full text-sm"
                 >
                   <span>{symptom.text}</span>
                   <button
