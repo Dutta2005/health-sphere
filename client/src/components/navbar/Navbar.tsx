@@ -55,11 +55,11 @@ const Navbar = () => {
                     <NavLink
                       to={option.link}
                       className={({ isActive }) =>
-                        `hover:text-accent transition-colors ${
+                        `hover:text-secondary/60 transition-colors font-semibold ${
                           isActive
-                            ? "text-accent"
+                            ? "text-secondary"
                             : theme === "dark"
-                            ? "text-dark-text"
+                            ? "text-dark-text/80"
                             : "text-light-text"
                         }`
                       }

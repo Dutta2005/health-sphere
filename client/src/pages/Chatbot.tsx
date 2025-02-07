@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Send, Plus, X } from "lucide-react";
+import { Send, Plus, X, Loader2, MessageSquare } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import {
@@ -28,6 +28,7 @@ const MedicalChatbot: React.FC = () => {
   const [additionalMessage, setAdditionalMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const symptomInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     scrollToBottom();
@@ -47,6 +48,7 @@ const MedicalChatbot: React.FC = () => {
         },
       ]);
       setCurrentSymptom("");
+      symptomInputRef.current?.focus();
     }
   };
 
@@ -95,50 +97,68 @@ const MedicalChatbot: React.FC = () => {
       }
     } catch (error) {
       console.error("Error sending message:", error);
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "assistant",
+          content: "I apologize, but I encountered an error. Please try again.",
+        },
+      ]);
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="flex flex-col h-[90vh] md:h-[93vh] max-w-2xl mx-auto p-4 -mt-5">
-      <Card className="flex-grow flex flex-col h-full overflow-hidden">
-        <CardHeader className="shrink-0 p-3">
-          <CardTitle className="text-2xl text-secondary text-center font-samarkan">
-            Umeed
+    <div className="flex flex-col h-[90vh] md:h-[93vh] max-w-3xl mx-auto p-4 -mt-5">
+      <Card className="flex-grow flex flex-col h-full overflow-hidden border dark:border-secondary/50 shadow-xl">
+        <CardHeader className="shrink-0 px-6 py-4 relative">
+          <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-secondary/30 to-transparent" />
+          <CardTitle className="text-3xl text-center font-samarkan text-secondary">
+              Umeed
           </CardTitle>
         </CardHeader>
 
         <CardContent className="flex-grow flex flex-col gap-4 p-0 overflow-hidden">
           {messages.length === 0 && (
-            <div className="text-center text-sm text-gray-500 dark:text-dark-text/60 p-8 pt-16">
-              <p className="mb-2">
-                Add your symptoms using the input field below, or type your
-                health-related questions directly.
+            <div className="text-center space-y-6 text-light-text/90 dark:text-gray-400 p-8 pt-16">
+              <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-gradient-to-br from-secondary/20 to-primary/20 flex items-center justify-center">
+                <MessageSquare className="w-8 h-8 text-secondary/70" />
+              </div>
+              <p className="text-base font-medium">
+                Welcome to Umeed - Your Health Assistant
               </p>
-              <p>
-                Umeed will try to provide relevant information and
-                guidance.
-              </p>
+              <div className="max-w-md mx-auto space-y-2 text-sm">
+                <p>
+                  Add your symptoms using the input field below, or type your
+                  health-related questions directly.
+                </p>
+                <p className="text-sm opacity-80">
+                  Umeed will try to provide relevant information and guidance.
+                </p>
+              </div>
             </div>
           )}
-          <MessageList
-            messages={messages}
-            isLoading={isLoading}
-            messagesEndRef={messagesEndRef}
-          />
+          
+          <div className="flex-grow overflow-y-auto px-4">
+            <MessageList
+              messages={messages}
+              isLoading={isLoading}
+              messagesEndRef={messagesEndRef}
+            />
+          </div>
 
-          <div className="space-y-4 p-4 border-t shrink-0">
+          <div className="space-y-4 p-6 border-t dark:border-gray-800 bg-gradient-to-t from-background/80 to-transparent dark:from-gray-950/80">
             <div className="flex flex-wrap gap-2 min-h-[32px]">
               {symptoms.map((symptom) => (
                 <div
                   key={symptom.id}
-                  className="flex items-center gap-2 bg-primary/80 text-white px-3 py-1 rounded-full text-sm"
+                  className="flex items-center gap-2 bg-primary px-3 py-1 rounded-full text-white"
                 >
                   <span>{symptom.text}</span>
                   <button
                     onClick={() => removeSymptom(symptom.id)}
-                    className="hover:text-destructive"
+                    className="opacity-60 hover:opacity-100 transition-opacity"
                   >
                     <X className="w-3 h-3" />
                   </button>
@@ -146,41 +166,44 @@ const MedicalChatbot: React.FC = () => {
               ))}
             </div>
 
-            <div className="flex gap-2">
+            <div className="flex gap-3">
               <Input
+                ref={symptomInputRef}
                 value={currentSymptom}
                 onChange={(e) => setCurrentSymptom(e.target.value)}
                 onKeyPress={handleKeyPress}
                 placeholder="Add a symptom..."
-                className="flex-grow"
+                className="flex-grow bg-background/50 dark:bg-gray-900/50 border-gray-200 dark:border-gray-800 focus-visible:ring-1 focus-visible:ring-secondary/30 transition-shadow"
               />
               <Button
                 onClick={addSymptom}
                 variant="outline"
                 size="icon"
                 disabled={!currentSymptom.trim()}
-                className="bg-secondary dark:bg-secondary dark:text-dark-text hover:bg-secondary/90"
+                className="bg-secondary/90 hover:bg-secondary dark:hover:bg-secondary dark:bg-secondary/90 text-secondary-foreground border-0 shadow-sm transition-colors"
               >
                 <Plus className="w-4 h-4" />
               </Button>
             </div>
 
-            <div className="flex gap-2">
+            <div className="flex gap-3">
               <Input
                 value={additionalMessage}
                 onChange={(e) => setAdditionalMessage(e.target.value)}
-                onKeyPress={(e) => e.key === "Enter" && sendMessage()}
+                onKeyPress={(e) => e.key === "Enter" && !isLoading && sendMessage()}
                 placeholder="Additional details or questions... (optional)"
-                className="flex-grow"
+                className="flex-grow bg-background/50 dark:bg-gray-900/50 border-gray-200 dark:border-gray-800 focus-visible:ring-1 focus-visible:ring-secondary/30 transition-shadow"
               />
               <Button
                 onClick={sendMessage}
-                disabled={
-                  isLoading || (!symptoms.length && !additionalMessage.trim())
-                }
-                className="bg-secondary dark:bg-secondary dark:text-dark-text hover:bg-secondary/90"
+                disabled={isLoading || (!symptoms.length && !additionalMessage.trim())}
+                className="bg-secondary hover:bg-secondary/90 text-secondary-foreground border-0 shadow-sm px-6 transition-colors"
               >
-                <Send className="w-4 h-4" />
+                {isLoading ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Send className="w-4 h-4" />
+                )}
               </Button>
             </div>
           </div>
