@@ -165,8 +165,8 @@ function NotificationPage() {
   return (
     <div className="container max-w-2xl mx-auto px-4 py-6 space-y-4">
       {/* Rest of your JSX remains the same */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
+      <div className="flex md:items-center justify-between">
+        <div className="flex flex-col md:flex-row items-center gap-1 md:gap-4">
           <h1 className="text-2xl font-semibold">Notifications</h1>
           {notifications.length > 0 && (
             <p className="text-sm text-muted-foreground">
@@ -174,13 +174,13 @@ function NotificationPage() {
             </p>
           )}
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-col md:flex-row gap-2">
           {unreadCount > 0 && (
             <Button 
               variant="outline" 
               size="sm"
               onClick={markAllRead}
-              className="text-sm"
+              className="text-sm bg-secondary/90 text-white dark:bg-secondary/70"
             >
               Mark all as read
             </Button>
