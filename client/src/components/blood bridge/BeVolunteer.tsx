@@ -61,8 +61,8 @@ export default function BeVolunteer({ id }: { id: string }) {
             Do you want to share your details with this person?
           </AlertDialogDescription>
         </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogAction onClick={() => handleSubmit(false)}>
+        <AlertDialogFooter className="gap-2">
+          <AlertDialogAction onClick={() => handleSubmit(false)} >
             Continue without sharing
           </AlertDialogAction>
           <AlertDialogAction onClick={() => handleSubmit(true)}>
