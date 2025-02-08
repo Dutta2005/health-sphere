@@ -132,7 +132,7 @@ const PastActivities = () => {
                   <img
                     src={post.thumbnail}
                     alt={post.title}
-                    className="w-full h-48 object-cover rounded-md mb-4"
+                    className="w-full h-auto aspect-[16/9] object-cover rounded-md mb-4"
                   />
                 )}
                 <p className="text-light-text whitespace-pre-wrap dark:text-dark-text">

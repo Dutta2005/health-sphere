@@ -119,7 +119,7 @@ function OrgPostView() {
             <img
               src={post.thumbnail}
               alt={post.title}
-              className="w-full h-48 object-cover rounded-md my-4"
+              className="w-full h-auto object-cover rounded-md my-4"
             />
           )}
           <div className="flex items-center gap-2 mt-5">
